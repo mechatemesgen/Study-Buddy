@@ -41,23 +41,23 @@ Our platform connects students to study smarter, not harder — whether it’s t
 ### Frontend
 
 
-# 1. Clone the repository
+### 1. Clone the repository
 ```bash
 git clone https://github.com/mechatemesgen/Study-Buddy.git
 
 ```
-# 2. Navigate into the project folder
+### 2. Navigate into the project folder
 
 ```bash
 cd Study-Buddy
 ```
 
-# 3. Install dependencies
+### 3. Install dependencies
 
 ```bash
 npm install
 ```
-# 4. Start the development server
+### 4. Start the development server
 
 ```bash
 npm run dev
