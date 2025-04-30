@@ -1,6 +1,5 @@
-// src/components/Navbar.jsx
 import { Link, useLocation } from "react-router-dom"
-import { BookOpen, Moon, Sun } from "lucide-react"
+import { BookOpen, Moon, Sun, Menu } from "lucide-react"
 import { useAuth } from "../../hooks/use-auth"
 import { useTheme } from "next-themes"
 import {
@@ -8,9 +7,10 @@ import {
     DropdownMenuTrigger,
     DropdownMenuContent,
     DropdownMenuItem,
-  } from "../ui/dropdown-menu"
-import Button from "../ui/button";
-
+} from "../ui/dropdown-menu"
+import { Drawer } from "../ui/drawer"
+import { Button } from "@/components/ui/button"; // Named import
+import { useState, useEffect } from "react"
 
 export function Navbar() {
   const { pathname } = useLocation()
@@ -18,6 +18,11 @@ export function Navbar() {
   const isAuthPage = ["/login", "/signup"].includes(pathname)
   const { user, logout } = useAuth()
   const { setTheme } = useTheme()
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false)
+
+  useEffect(() => {
+    setIsDrawerOpen(false)
+  }, [pathname])
 
   if (pathname.startsWith("/dashboard")) return null
 
@@ -29,7 +34,7 @@ export function Navbar() {
           <span className="text-xl font-bold">Study Buddy</span>
         </Link>
 
-        {/* ── Group 1: Anchors only on Home ── */}
+        {/* Desktop Navigation */}
         {isHome && (
           <nav className="hidden md:flex items-center gap-6">
             <Link to="/#features" className="text-sm font-medium hover:text-primary transition-colors">Features</Link>
@@ -37,8 +42,6 @@ export function Navbar() {
             <Link to="/#testimonials" className="text-sm font-medium hover:text-primary transition-colors">Testimonials</Link>
           </nav>
         )}
-
-        {/* ── Group 2: Other-page links (only when not on Home) ── */}
         {!isHome && (
           <nav className="hidden md:flex items-center gap-6">
             <Link to="/about" className="text-sm font-medium hover:text-primary transition-colors">About Us</Link>
@@ -46,7 +49,7 @@ export function Navbar() {
         )}
 
         <div className="flex items-center gap-4">
-          {/* Theme Toggle always available */}
+          {/* Theme Toggle */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon">
@@ -64,7 +67,7 @@ export function Navbar() {
 
           {!user ? (
             <>
-              {/* Sign In / Up only when not on auth pages */}
+              {/* Desktop Sign In / Up */}
               {!isAuthPage && (
                 <div className="hidden md:flex gap-2">
                   <Button asChild variant="outline">
@@ -76,29 +79,11 @@ export function Navbar() {
                 </div>
               )}
 
-              {/* Mobile menu: merge both groups for small screens */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild className="md:hidden">
-                  <Button variant="outline" size="icon">
-                    <BookOpen className="h-5 w-5" />
-                    <span className="sr-only">Menu</span>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  {isHome && <>
-                    <DropdownMenuItem asChild><Link to="/#features">Features</Link></DropdownMenuItem>
-                    <DropdownMenuItem asChild><Link to="/#how-it-works">How It Works</Link></DropdownMenuItem>
-                    <DropdownMenuItem asChild><Link to="/#testimonials">Testimonials</Link></DropdownMenuItem>
-                  </>}
-                  {!isHome && (
-                    <DropdownMenuItem asChild><Link to="/about">About Us</Link></DropdownMenuItem>
-                  )}
-                  {!isAuthPage && <>
-                    <DropdownMenuItem asChild><Link to="/login">Sign In</Link></DropdownMenuItem>
-                    <DropdownMenuItem asChild><Link to="/signup">Sign Up</Link></DropdownMenuItem>
-                  </>}
-                </DropdownMenuContent>
-              </DropdownMenu>
+              {/* Mobile Hamburger Menu */}
+              <Button variant="outline" size="icon" className="md:hidden" onClick={() => setIsDrawerOpen(true)}>
+                <Menu className="h-5 w-5" />
+                <span className="sr-only">Menu</span>
+              </Button>
             </>
           ) : (
             <>
@@ -112,6 +97,26 @@ export function Navbar() {
           )}
         </div>
       </div>
+
+      {/* Side Navigation Drawer for Mobile */}
+      {!user && (
+        <Drawer open={isDrawerOpen} onClose={() => setIsDrawerOpen(false)} side="left">
+          <div className="flex flex-col gap-4 p-4">
+            {isHome && <>
+              <Link to="/#features" className="text-lg font-medium" onClick={() => setIsDrawerOpen(false)}>Features</Link>
+              <Link to="/#how-it-works" className="text-lg font-medium" onClick={() => setIsDrawerOpen(false)}>How It Works</Link>
+              <Link to="/#testimonials" className="text-lg font-medium" onClick={() => setIsDrawerOpen(false)}>Testimonials</Link>
+            </>}
+            {!isHome && (
+              <Link to="/about" className="text-lg font-medium" onClick={() => setIsDrawerOpen(false)}>About Us</Link>
+            )}
+            {!isAuthPage && <>
+              <Link to="/login" className="text-lg font-medium" onClick={() => setIsDrawerOpen(false)}>Sign In</Link>
+              <Link to="/signup" className="text-lg font-medium" onClick={() => setIsDrawerOpen(false)}>Sign Up</Link>
+            </>}
+          </div>
+        </Drawer>
+      )}
     </header>
   )
 }
