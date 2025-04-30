@@ -1,13 +1,14 @@
-import { useState } from 'react'
-import MainLogo from './assets/Logo.svg'
+import React from 'react'
+//import { AuthProvider } from './context/AuthContext' // Adjust the import path as necessary
+import AppRoutes from './routes/AppRoutes'
+import { AuthProvider } from "./hooks/use-auth";
+
 
 function App() {
-  
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen">
-      <img src={MainLogo} alt="Main Logo" />
-      <h1 className="text-center">With this let the hackathon begin!</h1>
-    </div>
+    <AuthProvider>
+      <AppRoutes />
+    </AuthProvider>
   )
 }
 

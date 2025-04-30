@@ -1,48 +1,57 @@
+// src/components/Navbar.jsx
 import { Link, useLocation } from "react-router-dom"
 import { BookOpen, Moon, Sun } from "lucide-react"
-import { useAuth } from "@/hooks/use-auth"
-import { useTheme } from "@/hooks/use-theme"
+import { useAuth } from "../../hooks/use-auth"
+import { useTheme } from "next-themes"
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger
-} from "@/components/ui/dropdown-menu"
-import { Button } from "@/components/ui/button"
+    DropdownMenu,
+    DropdownMenuTrigger,
+    DropdownMenuContent,
+    DropdownMenuItem,
+  } from "../ui/dropdown-menu"
+import Button from "../ui/button";
+
 
 export function Navbar() {
-  const location = useLocation()
-  const pathname = location.pathname
+  const { pathname } = useLocation()
+  const isHome = pathname === "/"
+  const isAuthPage = ["/login", "/signup"].includes(pathname)
   const { user, logout } = useAuth()
   const { setTheme } = useTheme()
-  const isAuthPage = pathname === "/login" || pathname === "/signup"
-  const isDashboard = pathname.startsWith("/dashboard")
 
-  if (isDashboard) return null
+  if (pathname.startsWith("/dashboard")) return null
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container mx-auto flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur">
+      <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <Link to="/" className="flex items-center gap-2">
           <BookOpen className="h-6 w-6" />
           <span className="text-xl font-bold">Study Buddy</span>
         </Link>
 
-        {/* Desktop Nav */}
-        <nav className="hidden md:flex items-center gap-6">
-          <Link to="/#features" className="text-sm font-medium hover:text-primary transition-colors">Features</Link>
-          <Link to="/#how-it-works" className="text-sm font-medium hover:text-primary transition-colors">How It Works</Link>
-          <Link to="/#testimonials" className="text-sm font-medium hover:text-primary transition-colors">Testimonials</Link>
-          <Link to="/about" className="text-sm font-medium hover:text-primary transition-colors">About Us</Link>
-        </nav>
+        {/* ── Group 1: Anchors only on Home ── */}
+        {isHome && (
+          <nav className="hidden md:flex items-center gap-6">
+            <Link to="/#features" className="text-sm font-medium hover:text-primary transition-colors">Features</Link>
+            <Link to="/#how-it-works" className="text-sm font-medium hover:text-primary transition-colors">How It Works</Link>
+            <Link to="/#testimonials" className="text-sm font-medium hover:text-primary transition-colors">Testimonials</Link>
+          </nav>
+        )}
+
+        {/* ── Group 2: Other-page links (only when not on Home) ── */}
+        {!isHome && (
+          <nav className="hidden md:flex items-center gap-6">
+            <Link to="/about" className="text-sm font-medium hover:text-primary transition-colors">About Us</Link>
+          </nav>
+        )}
 
         <div className="flex items-center gap-4">
-          {/* Theme Toggle */}
+          {/* Theme Toggle always available */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon">
-                <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-                <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+                <Sun className="h-[1.2rem] w-[1.2rem] transition-all dark:hidden" />
+                <Moon className="h-[1.2rem] w-[1.2rem] transition-all hidden dark:block" />
                 <span className="sr-only">Toggle theme</span>
               </Button>
             </DropdownMenuTrigger>
@@ -53,23 +62,21 @@ export function Navbar() {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          {/* Auth Buttons */}
           {!user ? (
             <>
-              <div className="hidden md:block">
-                {!isAuthPage && (
-                  <>
-                    <Button asChild variant="outline" className="mr-2">
-                      <Link to="/login">Sign In</Link>
-                    </Button>
-                    <Button asChild>
-                      <Link to="/signup">Sign Up</Link>
-                    </Button>
-                  </>
-                )}
-              </div>
+              {/* Sign In / Up only when not on auth pages */}
+              {!isAuthPage && (
+                <div className="hidden md:flex gap-2">
+                  <Button asChild variant="outline">
+                    <Link to="/login">Sign In</Link>
+                  </Button>
+                  <Button asChild>
+                    <Link to="/signup">Sign Up</Link>
+                  </Button>
+                </div>
+              )}
 
-              {/* Mobile Menu */}
+              {/* Mobile menu: merge both groups for small screens */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild className="md:hidden">
                   <Button variant="outline" size="icon">
@@ -78,28 +85,18 @@ export function Navbar() {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuItem asChild>
-                    <Link to="/#features">Features</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link to="/#how-it-works">How It Works</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link to="/#testimonials">Testimonials</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link to="/about">About Us</Link>
-                  </DropdownMenuItem>
-                  {!isAuthPage && (
-                    <>
-                      <DropdownMenuItem asChild>
-                        <Link to="/login">Sign In</Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link to="/signup">Sign Up</Link>
-                      </DropdownMenuItem>
-                    </>
+                  {isHome && <>
+                    <DropdownMenuItem asChild><Link to="/#features">Features</Link></DropdownMenuItem>
+                    <DropdownMenuItem asChild><Link to="/#how-it-works">How It Works</Link></DropdownMenuItem>
+                    <DropdownMenuItem asChild><Link to="/#testimonials">Testimonials</Link></DropdownMenuItem>
+                  </>}
+                  {!isHome && (
+                    <DropdownMenuItem asChild><Link to="/about">About Us</Link></DropdownMenuItem>
                   )}
+                  {!isAuthPage && <>
+                    <DropdownMenuItem asChild><Link to="/login">Sign In</Link></DropdownMenuItem>
+                    <DropdownMenuItem asChild><Link to="/signup">Sign Up</Link></DropdownMenuItem>
+                  </>}
                 </DropdownMenuContent>
               </DropdownMenu>
             </>
