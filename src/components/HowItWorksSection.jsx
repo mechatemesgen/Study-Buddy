@@ -85,7 +85,7 @@ export default function HowItWorksSection() {
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                     />
                     <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <div className="rounded-full bg-white p-3 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                      <div className="rounded-full bg-gray-200/20 p-3 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
                         <Icon className={`h-6 w-6 ${iconColor}`} />
                       </div>
                     </div>

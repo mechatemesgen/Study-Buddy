@@ -37,7 +37,7 @@ export function Navbar() {
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
       <Link to="/" className="flex items-center gap-2">
         <HashLink
-          smooth // Add smooth scrolling
+          smooth 
           to="/#"
           className="flex items-center gap-2"
         >
@@ -152,6 +152,7 @@ export function Navbar() {
               <X className="h-6 w-6" />
             </Button>
           </div>
+          
           <div className="flex flex-col gap-4">
             <HashLink
               smooth // Add smooth prop

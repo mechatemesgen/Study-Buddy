@@ -34,21 +34,21 @@ export default function HomePage() {
           <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="space-y-2">
-                <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
+                <h2 className="text-2xl font-bold tracking-tighter sm:text-3xl md:text-4xl">
                   Ready to start learning together?
                 </h2>
-                <p className="mx-auto max-w-[700px] text-muted-foreground md:text-xl">
+                <p className="mx-auto max-w-[90%] text-muted-foreground sm:max-w-[700px] sm:text-base md:text-xl">
                   Join Study Buddy today and transform your study sessions into productive, collaborative experiences.
                 </p>
               </div>
-              <div className="space-x-4">
+              <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4">
                 <Link to="/signup">
-                  <Button size="lg" className="animate-pulse">
+                  <Button size="lg" className="w-full sm:w-auto animate-pulse">
                     Get Started for Free
                   </Button>
                 </Link>
                 <Link to="/contact">
-                  <Button variant="outline" size="lg">
+                  <Button variant="outline" size="lg" className="w-full sm:w-auto">
                     Contact Us
                   </Button>
                 </Link>
