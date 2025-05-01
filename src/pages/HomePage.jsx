@@ -1,27 +1,32 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { HeroSection } from "../components/hero-section";
-import { FeatureSection } from "../components/feature-section";
-import { Navbar } from "../components/NavBar/NavBar";
-import { Footer } from "../components/Footer/Footer";
-import { HowItWorksSection } from "../components/how-it-works-section";
-import { TestimonialsSection } from "@/components/testimonials-section";
-import { StatsSection } from "@/components/stats-section";
-import { FaqSection } from "@/components/faq-section";
+import { HeroSection } from "../components/HeroSection";
+import { FeatureSection } from "../components/FeatureSection";
+import HowItWorksSection from "@/components/HowItWorksSection";
+import TestimonialsSection from "@/components/TestimonialsSection";
+import StatsSection from "../components/StatsSection";
 
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-background">
-      <Navbar />
       <main>
-        <HeroSection />
-        <StatsSection />
-        <FeatureSection />
-        <HowItWorksSection />
-        <TestimonialsSection />
-        <FaqSection />
-        <section className="py-16 bg-gradient-to-b from-background to-muted">
+        <div id="hero">
+          <HeroSection />
+        </div>
+        <div id="stats">
+          <StatsSection />
+        </div>
+        <div id="features">
+          <FeatureSection />
+        </div>
+        <div id="how-it-works">
+          <HowItWorksSection />
+        </div>
+        <div id="testimonials">
+          <TestimonialsSection />
+        </div>
+        <section id="get-started" className="py-16 bg-gradient-to-b from-background to-muted">
           <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="space-y-2">
@@ -48,7 +53,6 @@ export default function HomePage() {
           </div>
         </section>
       </main>
-      <Footer />
     </div>
   );
 }

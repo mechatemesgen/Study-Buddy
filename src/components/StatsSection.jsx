@@ -1,9 +1,9 @@
 import React from 'react'
 
-function stats-section() {
+function StatsSection() {
   return (
-    <div>stats-section</div>
+    <div>StatsSection</div>
   )
 }
 
-export default stats-section
+export default StatsSection
