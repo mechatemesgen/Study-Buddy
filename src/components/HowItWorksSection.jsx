@@ -1,8 +1,14 @@
-// src/components/HowItWorksSection.jsx
 
 import React from 'react'
 import { ArrowRight, Users, Calendar, FileText, Video } from 'lucide-react'
 import { Card, CardContent } from './ui/card' // adjust path if needed
+
+import JoinStudyGroups from '../../src/assets/JoinStudyGroups.jpg'
+import ScheduleStudySessions from '../../src/assets/ScheduleStudySessions.jpg'
+import ShareStudyResources from '../../src/assets/ShareStudyResources.jpg'
+import CollaborateinRealTime from '../../src/assets/CollaborateinRealTime.jpg'
+
+
 
 const steps = [
   {
@@ -11,7 +17,7 @@ const steps = [
     description:
       'Form study groups based on your courses, subjects, or specific topics you want to master.',
     color: 'bg-blue-500',
-    image: '/placeholder.svg?height=200&width=300',
+    image: JoinStudyGroups,
   },
   {
     icon: Calendar,
@@ -19,7 +25,7 @@ const steps = [
     description:
       "Use our interactive calendar to plan study sessions that work with everyone's schedule.",
     color: 'bg-purple-500',
-    image: '/placeholder.svg?height=200&width=300',
+    image: ScheduleStudySessions,
   },
   {
     icon: FileText,
@@ -27,7 +33,7 @@ const steps = [
     description:
       'Upload and share notes, practice problems, flashcards, and other study materials.',
     color: 'bg-green-500',
-    image: '/placeholder.svg?height=200&width=300',
+    image: ShareStudyResources,
   },
   {
     icon: Video,
@@ -35,7 +41,7 @@ const steps = [
     description:
       'Meet virtually for study sessions with video conferencing and collaborative tools.',
     color: 'bg-amber-500',
-    image: '/placeholder.svg?height=200&width=300',
+    image: CollaborateinRealTime,
   },
 ]
 

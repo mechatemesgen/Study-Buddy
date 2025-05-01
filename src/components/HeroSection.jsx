@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { CheckCircle } from "lucide-react";
-import StudentsImage from "../../src/assets/students1.png";
+import StudentsImage from "../../src/assets/StudySmarterHero.jpg";
 
 export function HeroSection() {
   return (
