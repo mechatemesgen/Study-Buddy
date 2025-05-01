@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";  // React Router Link instead of Next.js Link
 import { Button } from "@/components/ui/button";
 import { CheckCircle } from "lucide-react";
+import StudentsImage from "../../src/assets/students1.png";
 
 export function HeroSection() {
   return (
@@ -57,13 +58,13 @@ export function HeroSection() {
           <div className="relative mx-auto w-full max-w-[600px]">
             <div className="aspect-video rounded-xl overflow-hidden shadow-2xl border border-border/50 relative">
               <img
-                src="/placeholder.svg?height=600&width=800"
+                src={StudentsImage}
                 alt="Students collaborating on a study session"
                 className="object-cover w-full h-full"
               />
 
               {/* Floating elements */}
-              <div className="absolute -top-6 -right-6 bg-background rounded-lg p-4 shadow-lg border border-border/50 w-48 hidden md:block">
+              <div className="absolute -top-0 -right-0 m-2 bg-background rounded-lg p-4 shadow-lg border border-border/50 w-48 hidden md:block">
                 <div className="text-sm font-medium">Next Study Session</div>
                 <div className="text-xs text-muted-foreground mt-1">Calculus Group • Today, 3:00 PM</div>
                 <div className="mt-2 h-1 bg-primary rounded-full w-3/4"></div>

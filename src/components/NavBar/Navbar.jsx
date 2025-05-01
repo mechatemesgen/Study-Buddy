@@ -139,7 +139,7 @@ export function Navbar() {
               onClick={() => setIsDrawerOpen(false)}
               aria-label="Close menu"
             >
-              <X className="h-5 w-5" />
+              <X className="h-6 w-6" />
             </Button>
           </div>
           <div className="flex flex-col gap-4">

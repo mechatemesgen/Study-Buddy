@@ -71,8 +71,8 @@ DrawerOverlay.displayName = DrawerPrimitive.Overlay.displayName
 
 export {
   Drawer,
-  DrawerPortal, // Export if needed
-  DrawerOverlay, // Export if needed
-  DrawerTrigger, // Export if needed
-  DrawerClose,  // Export if needed
+  DrawerPortal, 
+  DrawerOverlay,
+  DrawerTrigger, 
+  DrawerClose,  
 }

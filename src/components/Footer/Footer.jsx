@@ -90,7 +90,7 @@ export function Footer() {
           </div>
 
           <div className="space-y-4">
-            <h3 className="text-lg font-medium">Company</h3>
+            <h3 className="text-lg font-medium">Quick Links</h3>
             <ul className="space-y-2">
               <li>
                 <Link to="/about" className="text-sm text-muted-foreground hover:text-primary">
