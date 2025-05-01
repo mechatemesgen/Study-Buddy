@@ -1,4 +1,5 @@
 import * as React from "react"
+import { Slot } from "@radix-ui/react-slot"
 import { cn } from "@/lib/utils"
 
 const buttonVariants = {
@@ -19,17 +20,15 @@ const buttonSizes = {
 
 const Button = React.forwardRef(
   ({ className, variant = "default", size = "default", asChild = false, ...props }, ref) => {
-    const Comp = asChild ? React.Fragment : "button"
+    const Comp = asChild ? Slot : "button"
     return (
       <Comp
-        {...(!asChild && {
-          className: cn(
-            "inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
-            buttonVariants[variant],
-            buttonSizes[size],
-            className
-          ),
-        })}
+        className={cn(
+          "inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+          buttonVariants[variant],
+          buttonSizes[size],
+          className
+        )}
         ref={ref}
         {...props}
       />

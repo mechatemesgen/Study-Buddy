@@ -1,4 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
+import { HashLink } from 'react-router-hash-link'; // Import HashLink
 import { BookOpen, Moon, Sun, Menu, X } from "lucide-react";
 import { useAuth } from "../../hooks/use-auth";
 import { useTheme } from "next-themes";
@@ -34,31 +35,40 @@ export function Navbar() {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
-        <Link to="/" className="flex items-center gap-2">
+      <Link to="/" className="flex items-center gap-2">
+        <HashLink
+          smooth // Add smooth scrolling
+          to="/#"
+          className="flex items-center gap-2"
+        >
           <BookOpen className="h-6 w-6" />
           <span className="text-xl font-bold">Study Buddy</span>
-        </Link>
+        </HashLink>
+      </Link>
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center gap-6">
-          <Link
+          <HashLink
+            smooth // Add smooth prop
             to="/#features"
             className="text-sm font-medium hover:text-primary transition-colors"
           >
             Features
-          </Link>
-          <Link
+          </HashLink>
+          <HashLink
+            smooth // Add smooth prop
             to="/#how-it-works"
             className="text-sm font-medium hover:text-primary transition-colors"
           >
             How It Works
-          </Link>
-          <Link
+          </HashLink>
+          <HashLink
+            smooth // Add smooth prop
             to="/#testimonials"
             className="text-sm font-medium hover:text-primary transition-colors"
           >
             Testimonials
-          </Link>
+          </HashLink>
           <Link
             to="/about"
             className="text-sm font-medium hover:text-primary transition-colors"
@@ -143,27 +153,30 @@ export function Navbar() {
             </Button>
           </div>
           <div className="flex flex-col gap-4">
-            <Link
+            <HashLink
+              smooth // Add smooth prop
               to="/#features"
               className="text-lg font-medium"
               onClick={() => setIsDrawerOpen(false)}
             >
               Features
-            </Link>
-            <Link
+            </HashLink>
+            <HashLink
+              smooth // Add smooth prop
               to="/#how-it-works"
               className="text-lg font-medium"
               onClick={() => setIsDrawerOpen(false)}
             >
               How It Works
-            </Link>
-            <Link
+            </HashLink>
+            <HashLink
+              smooth // Add smooth prop
               to="/#testimonials"
               className="text-lg font-medium"
               onClick={() => setIsDrawerOpen(false)}
             >
               Testimonials
-            </Link>
+            </HashLink>
             <Link
               to="/about"
               className="text-lg font-medium"

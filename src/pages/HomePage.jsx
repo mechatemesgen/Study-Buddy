@@ -6,7 +6,7 @@ import { FeatureSection } from "../components/FeatureSection";
 import HowItWorksSection from "@/components/HowItWorksSection";
 import TestimonialsSection from "@/components/TestimonialsSection";
 import StatsSection from "../components/StatsSection";
-// import { FaqSection } from "@/components/FaqSection";
+import  FaqSection  from "@/components/FaqSection";
 
 export default function HomePage() {
   return (
@@ -28,7 +28,7 @@ export default function HomePage() {
           <TestimonialsSection />
         </div>
         <div id="faq">
-          {/* <FaqSection /> */}
+          <FaqSection />
         </div>
         <section id="get-started" className="py-16 bg-gradient-to-b from-background to-muted">
           <div className="container px-4 md:px-6">

@@ -1,11 +1,10 @@
-import { Link } from "react-router-dom";  // React Router Link instead of Next.js Link
 import { Button } from "@/components/ui/button";
 import { CheckCircle } from "lucide-react";
 import StudentsImage from "../../src/assets/students1.png";
 
 export function HeroSection() {
   return (
-    <section className="w-full py-12 md:py-24 lg:py-32 bg-gradient-to-b from-background to-background/80 relative overflow-hidden">
+    <section className="w-full py-3 md:py-1 lg:py-10 bg-gradient-to-b from-background to-background/80 relative overflow-hidden">
       {/* Decorative elements */}
       <div className="absolute inset-0 -z-10 overflow-hidden">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl"></div>
@@ -43,10 +42,10 @@ export function HeroSection() {
 
             <div className="flex flex-col sm:flex-row gap-3">
               <Button asChild size="lg" className="w-full sm:w-auto">
-                <Link to="/signup">Get Started — It's Free</Link>  {/* Updated for React Router */}
+                <a href="/signup">Get Started</a>
               </Button>
               <Button asChild variant="outline" size="lg" className="w-full sm:w-auto">
-                <Link to="#how-it-works">See How It Works</Link>  {/* Updated for React Router */}
+                <a href="#how-it-works">See How It Works</a>
               </Button>
             </div>
 
