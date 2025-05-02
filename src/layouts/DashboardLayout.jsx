@@ -1,11 +1,15 @@
-import { Outlet } from 'react-router-dom'
+import { Outlet } from 'react-router-dom';
+import { Sidebar, SidebarProvider } from '../components/ui/Sidebar';
 
 export default function DashboardLayout() {
   return (
-    <div>
-      {/* You can add the sidebar, navbar, etc., for the dashboard layout here */}
-      <h1>Dashboard Layout</h1>
-      <Outlet /> {/* This will render the Dashboard component */}
-    </div>
-  )
+    <SidebarProvider>
+      <div className="flex">
+        <Sidebar />
+        <div className="flex-1">
+          <Outlet /> {/* This will render the Dashboard component */}
+        </div>
+      </div>
+    </SidebarProvider>
+  );
 }

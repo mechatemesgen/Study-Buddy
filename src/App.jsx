@@ -1,15 +1,19 @@
-import React from 'react'
-//import { AuthProvider } from './context/AuthContext' // Adjust the import path as necessary
-import { AuthProvider } from './contexts/auth-context'
-import AppRoutes from './routes/AppRoutes'
+import React from 'react';
+import { AuthProvider } from './contexts/auth-context'; // Adjust the import path as necessary
+import AppRoutes from './routes/AppRoutes';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
+// Create a new instance of QueryClient
+const queryClient = new QueryClient();
 
 function App() {
   return (
-    <AuthProvider>
-      <AppRoutes />
-    </AuthProvider>
-  )
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <AppRoutes />
+      </AuthProvider>
+    </QueryClientProvider>
+  );
 }
 
-export default App
+export default App;
