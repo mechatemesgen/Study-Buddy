@@ -53,7 +53,6 @@ export function Navbar() {
           >
             Home
           </HashLink>
-
           <HashLink
             smooth
             to="/#features"
@@ -142,8 +141,8 @@ export function Navbar() {
         title="Navigation Menu"
         description="Main navigation links for the site"
       >
-        <div className="flex flex-col p-4">
-          <div className="flex justify-end mb-4">
+        <div className="flex flex-col h-full p-4">
+          <div className="flex justify-end">
             <Button
               variant="ghost"
               size="icon"
@@ -154,50 +153,28 @@ export function Navbar() {
             </Button>
           </div>
           
-          <div className="flex flex-col gap-4">
-            <HashLink
-              smooth
-              to="/#"
-              className="text-lg font-medium"
-              onClick={() => setIsDrawerOpen(false)}
-            >
-              Home
-            </HashLink>
-            <HashLink
-              smooth
-              to="/#features"
-              className="text-lg font-medium"
-              onClick={() => setIsDrawerOpen(false)}
-            >
-              Features
-            </HashLink>
-            <HashLink
-              smooth
-              to="/#how-it-works"
-              className="text-lg font-medium"
-              onClick={() => setIsDrawerOpen(false)}
-            >
-              How It Works
-            </HashLink>
-            <HashLink
-              smooth
-              to="/#testimonials"
-              className="text-lg font-medium"
-              onClick={() => setIsDrawerOpen(false)}
-            >
-              Testimonials
-            </HashLink>
-            <HashLink
-              smooth
-              to="/about#"
-              className="text-lg font-medium"
-              onClick={() => setIsDrawerOpen(false)}
-            >
-              About Us
-            </HashLink>
+          <div className="flex flex-col">
+            {[
+              { to: "/#", label: "Home" },
+              { to: "/#features", label: "Features" },
+              { to: "/#how-it-works", label: "How It Works" },
+              { to: "/#testimonials", label: "Testimonials" },
+              { to: "/about#", label: "About Us" },
+            ].map((item) => (
+              <HashLink
+                key={item.to}
+                smooth
+                to={item.to}
+                className="py-3 px-4 text-lg font-medium hover:bg-accent  rounded-sm "
+                onClick={() => setIsDrawerOpen(false)}
+              >
+                {item.label}
+              </HashLink>
+            ))}
           </div>
+          
           {!user && (
-            <div className="mt-4">
+            <div className="mt-6">
               <Button asChild variant="outline" className="w-full">
                 <HashLink smooth to={authButtonLink} onClick={() => setIsDrawerOpen(false)}>
                   {authButtonText}
@@ -205,6 +182,10 @@ export function Navbar() {
               </Button>
             </div>
           )}
+          
+          <div className="mt-auto pt-6 text-center text-sm text-muted-foreground">
+            &copy; {new Date().getFullYear()} Study Buddy. All rights reserved.
+          </div>
         </div>
       </Drawer>
     </header>
