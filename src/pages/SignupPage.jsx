@@ -1,6 +1,4 @@
-// src/pages/SignupPage.jsx
-
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/use-auth'
 import {Navbar} from '../components/Navbar/Navbar'
@@ -28,6 +26,10 @@ export default function SignupPage() {
   })
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/use-auth";
 import { Button } from "../components/ui/button";
@@ -23,6 +23,10 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -35,7 +39,7 @@ export default function LoginPage() {
       setError("Invalid email or password. Please try again.");
     } finally {
       setIsLoading(false);
-    }
+    } 
   };
 
   return (

@@ -1,4 +1,3 @@
-import { Link, useLocation } from "react-router-dom";
 import { HashLink } from 'react-router-hash-link'; // Import HashLink
 import { BookOpen, Moon, Sun, Menu, X } from "lucide-react";
 import { useAuth } from "../../hooks/use-auth";
@@ -12,6 +11,7 @@ import {
 import { Drawer } from "../ui/drawer";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 
 export function Navbar() {
   const { pathname } = useLocation();
@@ -35,7 +35,6 @@ export function Navbar() {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
-      <Link to="/" className="flex items-center gap-2">
         <HashLink
           smooth 
           to="/#"
@@ -44,37 +43,45 @@ export function Navbar() {
           <BookOpen className="h-6 w-6" />
           <span className="text-xl font-bold">Study Buddy</span>
         </HashLink>
-      </Link>
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center gap-6">
           <HashLink
-            smooth // Add smooth prop
+            smooth
+            to="/#"
+            className="text-sm font-medium hover:text-primary transition-colors"
+          >
+            Home
+          </HashLink>
+
+          <HashLink
+            smooth
             to="/#features"
             className="text-sm font-medium hover:text-primary transition-colors"
           >
             Features
           </HashLink>
           <HashLink
-            smooth // Add smooth prop
+            smooth
             to="/#how-it-works"
             className="text-sm font-medium hover:text-primary transition-colors"
           >
             How It Works
           </HashLink>
           <HashLink
-            smooth // Add smooth prop
+            smooth
             to="/#testimonials"
             className="text-sm font-medium hover:text-primary transition-colors"
           >
             Testimonials
           </HashLink>
-          <Link
-            to="/about"
+          <HashLink
+            smooth
+            to="/about#"
             className="text-sm font-medium hover:text-primary transition-colors"
           >
             About Us
-          </Link>
+          </HashLink>
         </nav>
 
         <div className="flex items-center gap-4">
@@ -88,15 +95,9 @@ export function Navbar() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="mt-3">
-              <DropdownMenuItem onClick={() => setTheme("light")}>
-                Light
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setTheme("dark")}>
-                Dark
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setTheme("system")}>
-                System
-              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setTheme("light")}>Light</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setTheme("dark")}>Dark</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setTheme("system")}>System</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
 
@@ -105,7 +106,7 @@ export function Navbar() {
               {/* Desktop Auth Button */}
               <div className="hidden md:block">
                 <Button asChild>
-                  <Link to={authButtonLink}>{authButtonText}</Link>
+                  <HashLink smooth to={authButtonLink}>{authButtonText}</HashLink>
                 </Button>
               </div>
 
@@ -123,7 +124,7 @@ export function Navbar() {
           ) : (
             <>
               <Button asChild variant="ghost">
-                <Link to="/dashboard">Dashboard</Link>
+                <HashLink smooth to="/dashboard">Dashboard</HashLink>
               </Button>
               <Button variant="outline" onClick={logout}>
                 Sign Out
@@ -138,8 +139,8 @@ export function Navbar() {
         open={isDrawerOpen}
         onClose={() => setIsDrawerOpen(false)}
         side="left"
-        title="Navigation Menu" // Add title
-        description="Main navigation links for the site" // Add description
+        title="Navigation Menu"
+        description="Main navigation links for the site"
       >
         <div className="flex flex-col p-4">
           <div className="flex justify-end mb-4">
@@ -155,7 +156,15 @@ export function Navbar() {
           
           <div className="flex flex-col gap-4">
             <HashLink
-              smooth // Add smooth prop
+              smooth
+              to="/#"
+              className="text-lg font-medium"
+              onClick={() => setIsDrawerOpen(false)}
+            >
+              Home
+            </HashLink>
+            <HashLink
+              smooth
               to="/#features"
               className="text-lg font-medium"
               onClick={() => setIsDrawerOpen(false)}
@@ -163,7 +172,7 @@ export function Navbar() {
               Features
             </HashLink>
             <HashLink
-              smooth // Add smooth prop
+              smooth
               to="/#how-it-works"
               className="text-lg font-medium"
               onClick={() => setIsDrawerOpen(false)}
@@ -171,27 +180,28 @@ export function Navbar() {
               How It Works
             </HashLink>
             <HashLink
-              smooth // Add smooth prop
+              smooth
               to="/#testimonials"
               className="text-lg font-medium"
               onClick={() => setIsDrawerOpen(false)}
             >
               Testimonials
             </HashLink>
-            <Link
-              to="/about"
+            <HashLink
+              smooth
+              to="/about#"
               className="text-lg font-medium"
               onClick={() => setIsDrawerOpen(false)}
             >
               About Us
-            </Link>
+            </HashLink>
           </div>
           {!user && (
             <div className="mt-4">
               <Button asChild variant="outline" className="w-full">
-                <Link to={authButtonLink} onClick={() => setIsDrawerOpen(false)}>
+                <HashLink smooth to={authButtonLink} onClick={() => setIsDrawerOpen(false)}>
                   {authButtonText}
-                </Link>
+                </HashLink>
               </Button>
             </div>
           )}

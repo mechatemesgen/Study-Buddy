@@ -1,25 +1,30 @@
 import React from "react";
 import { Users, Calendar, Clock, Award } from "lucide-react";
+import { useCountUpWhenInView } from "@/hooks/useCountUpWhenInView";
 
 const stats = [
   {
     icon: Users,
-    value: "10,000+",
+    value: 10000,
+    suffix: "+",
     label: "Active Users",
   },
   {
     icon: Calendar,
-    value: "25,000+",
+    value: 25000,
+    suffix: "+",
     label: "Study Sessions",
   },
   {
     icon: Clock,
-    value: "120,000+",
+    value: 120000,
+    suffix: "+",
     label: "Study Hours",
   },
   {
     icon: Award,
-    value: "92%",
+    value: 92,
+    suffix: "%",
     label: "Grade Improvement",
   },
 ];
@@ -31,6 +36,8 @@ export default function StatsSection() {
         <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
           {stats.map((stat, index) => {
             const Icon = stat.icon;
+            const { count, ref } = useCountUpWhenInView(stat.value, 2000);
+
             return (
               <div
                 key={index}
@@ -39,7 +46,10 @@ export default function StatsSection() {
                 <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
                   <Icon className="h-6 w-6 text-primary" />
                 </div>
-                <h3 className="text-3xl font-bold">{stat.value}</h3>
+                <h3 ref={ref} className="text-3xl font-bold">
+                  {count.toLocaleString()}
+                  {stat.suffix}
+                </h3>
                 <p className="text-sm text-muted-foreground">{stat.label}</p>
               </div>
             );
