@@ -26,7 +26,7 @@ export function Navbar() {
   }, [pathname]);
 
   if (isDashboard) {
-    return null; // Dashboard has its own header
+    return null; 
   }
 
   const authButtonText = pathname === "/signup" ? "Sign In" : "Sign Up";

@@ -1,7 +1,7 @@
 
 import React from 'react'
 import { ArrowRight, Users, Calendar, FileText, Video } from 'lucide-react'
-import { Card, CardContent } from './ui/card' // adjust path if needed
+import { Card, CardContent } from './ui/card' 
 
 import JoinStudyGroups from '../../src/assets/JoinStudyGroups.jpg'
 import ScheduleStudySessions from '../../src/assets/ScheduleStudySessions.jpg'
@@ -69,7 +69,6 @@ export default function HowItWorksSection() {
             const iconColor = step.color.replace('bg-', 'text-')
             return (
               <div key={idx} className="relative group flex flex-col">
-                {/* Connector arrow on xl+ */}
                 {idx < steps.length - 1 && (
                   <div
                     className="hidden xl:block absolute top-1/2 left-full h-px bg-border"

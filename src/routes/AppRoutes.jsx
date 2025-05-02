@@ -7,6 +7,7 @@ import AboutPage from '../pages/AboutPage'
 import LoginPage from '../pages/LoginPage'
 import SignupPage from '../pages/SignupPage'
 import Dashboard from '../pages/Dashboard'
+import PageNotFound from '../pages/PageNotFound'
 import { useAuth } from '../hooks/use-auth'
 
 export default function AppRoutes() {
@@ -35,7 +36,7 @@ export default function AppRoutes() {
       </Route>
 
       {/* catch-all */}
-      <Route path="*" element={<Navigate replace to="/" />} />
+      <Route path="*" element={<PageNotFound />} />
     </Routes>
   )
 }

@@ -1,8 +1,16 @@
-import { Link } from "react-router-dom"
-import { BookOpen, Facebook, Instagram, Twitter, Youtube } from "lucide-react"
+import { Link } from "react-router-dom";
+import { BookOpen, Facebook, Instagram, Twitter, Youtube } from "lucide-react";
 
 export function Footer() {
-  const currentYear = new Date().getFullYear()
+  const currentYear = new Date().getFullYear();
+
+  const handleSmoothScroll = (event, targetId) => {
+    event.preventDefault();
+    const targetElement = document.querySelector(targetId);
+    if (targetElement) {
+      targetElement.scrollIntoView({ behavior: "smooth" });
+    }
+  };
 
   return (
     <footer className="w-full border-t py-12 md:py-16 lg:py-20">
@@ -118,19 +126,8 @@ export function Footer() {
 
         <div className="mt-12 border-t pt-8 flex flex-col md:flex-row justify-between items-center">
           <p className="text-sm text-muted-foreground">© {currentYear} Study Buddy. All rights reserved.</p>
-          <div className="mt-4 md:mt-0 flex gap-4">
-            <Link to="/privacy" className="text-xs text-muted-foreground hover:text-primary">
-              Privacy
-            </Link>
-            <Link to="/terms" className="text-xs text-muted-foreground hover:text-primary">
-              Terms
-            </Link>
-            <Link to="/cookies" className="text-xs text-muted-foreground hover:text-primary">
-              Cookies
-            </Link>
-          </div>
         </div>
       </div>
     </footer>
-  )
+  );
 }
