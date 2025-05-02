@@ -1,6 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { CheckCircle } from "lucide-react";
 import StudentsImage from "../../src/assets/StudySmarterHero.jpg";
+import { Link } from "react-router-dom";
+
 
 export function HeroSection() {
   return (
@@ -42,10 +44,20 @@ export function HeroSection() {
 
             <div className="flex flex-col sm:flex-row gap-3">
               <Button asChild size="lg" className="w-full sm:w-auto">
-                <a href="/signup">Get Started</a>
+                <Link to="/signup">Get Started</Link>
               </Button>
-              <Button asChild variant="outline" size="lg" className="w-full sm:w-auto">
-                <a href="#how-it-works">See How It Works</a>
+              <Button
+                variant="outline"
+                size="lg"
+                className="w-full sm:w-auto"
+                onClick={() => {
+                  const target = document.querySelector("#how-it-works");
+                  if (target) {
+                    target.scrollIntoView({ behavior: "smooth" });
+                  }
+                }}
+              >
+                See How It Works
               </Button>
             </div>
 

@@ -48,7 +48,12 @@ export default function HomePage() {
                   </Button>
                 </Link>
                 <Link to="/contact">
-                  <Button variant="outline" size="lg" className="w-full sm:w-auto">
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="w-full sm:w-auto"
+                    onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+                  >
                     Contact Us
                   </Button>
                 </Link>

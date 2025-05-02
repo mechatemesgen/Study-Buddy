@@ -9,6 +9,7 @@ import SignupPage from '../pages/SignupPage'
 import Dashboard from '../pages/Dashboard'
 import PageNotFound from '../pages/PageNotFound'
 import { useAuth } from '../hooks/use-auth'
+import ContactUs from '@/pages/ContactUs'
 
 export default function AppRoutes() {
   const { user } = useAuth()
@@ -19,6 +20,7 @@ export default function AppRoutes() {
       <Route element={<MainLayout />}>
         <Route index element={<HomePage />} />
         <Route path="about" element={<AboutPage />} />
+        <Route path="contact" element={<ContactUs />} />
         <Route path="login" element={<LoginPage />} />
         <Route path="signup" element={<SignupPage />} />
       </Route>
