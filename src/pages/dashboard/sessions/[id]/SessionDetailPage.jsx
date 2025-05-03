@@ -15,14 +15,14 @@ import {
   AvatarFallback,
   AvatarImage,
 } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
+import { Badge } from "@/components/ui/Badge";
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
-} from "@/components/ui/tabs";
-import { useToast } from "@/components/ui/use-toast";
+} from "@/components/ui/Tabs";
+import { useToast } from "@/components/ui/toast";
 import {
   fetchSession,
   joinSession,

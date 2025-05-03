@@ -42,13 +42,13 @@ export default function SessionsPage() {
 
   // Filter sessions based on search query
   const filteredSessions = searchQuery
-    ? sessions?.filter(
+    ? (Array.isArray(sessions) ? sessions : []).filter(
         (session) =>
           session.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
           session.groupName.toLowerCase().includes(searchQuery.toLowerCase()) ||
           (session.description && session.description.toLowerCase().includes(searchQuery.toLowerCase())),
       )
-    : sessions
+    : (Array.isArray(sessions) ? sessions : []);
 
   // Get today's date at midnight for comparison
   const today = new Date()

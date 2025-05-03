@@ -18,6 +18,7 @@ import NotificationsPage from '../pages/dashboard/notifications/NotificationsPag
 import GroupChatPage from "../pages/dashboard/groups/[id]/chat/GroupChatPage";
 import GroupDetailPage from "../pages/dashboard/groups/[id]/GroupDetailPage";
 import ScheduleSessionPage from "../pages/dashboard/sessions/schedule/ScheduleSessionPage";
+import SessionDetailPage from "../pages/dashboard/sessions/[id]/SessionDetailPage";
 
 export default function AppRoutes() {
   const { user } = useAuth()
@@ -48,6 +49,7 @@ export default function AppRoutes() {
         <Route path="groups/:id/chat" element={<GroupChatPage />} />
         <Route path="sessions" element={<SessionsPage />} />
         <Route path="sessions/schedule" element={<ScheduleSessionPage />} />
+        <Route path="sessions/:id" element={<SessionDetailPage />} />
         <Route path="resources" element={<ResourcesPage />} />
         <Route path="profile" element={<ProfilePage />} />
         <Route path="settings" element={<SettingsPage />} />
