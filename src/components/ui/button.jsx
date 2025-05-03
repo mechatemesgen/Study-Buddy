@@ -19,8 +19,9 @@ const buttonSizes = {
 }
 
 const Button = React.forwardRef(
-  ({ className, variant = "default", size = "default", asChild = false, ...props }, ref) => {
+  ({ className, variant = "default", size = "default", asChild = false, isLoading, ...props }, ref) => {
     const Comp = asChild ? Slot : "button"
+    const { isLoading: _, ...restProps } = props; // Exclude isLoading from being passed to DOM
     return (
       <Comp
         className={cn(
@@ -30,7 +31,7 @@ const Button = React.forwardRef(
           className
         )}
         ref={ref}
-        {...props}
+        {...restProps} // Spread other props excluding isLoading
       />
     )
   }

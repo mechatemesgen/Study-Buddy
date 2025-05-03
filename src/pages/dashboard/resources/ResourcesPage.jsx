@@ -11,9 +11,9 @@ import { FileText, FileImage, FileCode, File, Search, Upload, Download, MoreHori
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 
 export default function ResourcesPage() {
-  const { resources, isLoading } = useResources()
-  const [searchQuery, setSearchQuery] = useState("")
-  const [isUploaderOpen, setIsUploaderOpen] = useState(false)
+  const { resources, isLoading } = useResources();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isUploaderOpen, setIsUploaderOpen] = useState(false);
 
   // Filter resources based on search query
   const filteredResources = searchQuery
@@ -21,15 +21,23 @@ export default function ResourcesPage() {
         (resource) =>
           resource.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
           resource.uploadedBy.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          resource.type.toLowerCase().includes(searchQuery.toLowerCase())
+          resource.type.toLowerCase().includes(searchQuery.toLowerCase()),
       )
-    : resources
+    : resources;
 
   // Group resources by type
-  const documentResources = filteredResources?.filter((r) => ["pdf", "doc", "docx", "txt"].includes(r.type))
-  const presentationResources = filteredResources?.filter((r) => ["ppt", "pptx"].includes(r.type))
-  const imageResources = filteredResources?.filter((r) => ["jpg", "png", "gif", "svg"].includes(r.type))
-  const codeResources = filteredResources?.filter((r) => ["js", "html", "css", "py", "java"].includes(r.type))
+  const documentResources = filteredResources?.filter((r) =>
+    ["pdf", "doc", "docx", "txt"].includes(r.type)
+  );
+  const presentationResources = filteredResources?.filter((r) =>
+    ["ppt", "pptx"].includes(r.type)
+  );
+  const imageResources = filteredResources?.filter((r) =>
+    ["jpg", "png", "gif", "svg"].includes(r.type)
+  );
+  const codeResources = filteredResources?.filter((r) =>
+    ["js", "html", "css", "py", "java"].includes(r.type)
+  );
   const otherResources = filteredResources?.filter(
     (r) =>
       ![
@@ -47,33 +55,33 @@ export default function ResourcesPage() {
         "html",
         "css",
         "py",
-        "java"
-      ].includes(r.type)
-  )
+        "java",
+      ].includes(r.type),
+  );
 
   return (
     <DashboardLayout>
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
-        <h1 className="text-3xl font-bold">Resources</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold">Resources</h1>
         <div className="flex flex-col sm:flex-row gap-2">
-          <div className="relative">
+          <div className="relative w-full sm:w-auto">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
               type="search"
               placeholder="Search resources..."
-              className="pl-8 w-full md:w-[200px] lg:w-[300px]"
+              className="pl-8 w-full sm:w-[200px] lg:w-[300px]"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
-          <Button onClick={() => setIsUploaderOpen(true)}>
+          <Button onClick={() => setIsUploaderOpen(true)} className="w-full sm:w-auto">
             <Upload className="h-4 w-4 mr-2" /> Upload Resource
           </Button>
         </div>
       </div>
 
       <Tabs defaultValue="all" className="space-y-6">
-        <TabsList>
+        <TabsList className="flex flex-wrap gap-2">
           <TabsTrigger value="all">All Resources</TabsTrigger>
           <TabsTrigger value="documents">Documents</TabsTrigger>
           <TabsTrigger value="presentations">Presentations</TabsTrigger>
@@ -88,7 +96,7 @@ export default function ResourcesPage() {
               <p className="mt-4 text-lg">Loading resources...</p>
             </div>
           ) : filteredResources && filteredResources.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredResources.map((resource) => (
                 <ResourceCard key={resource.id} resource={resource} />
               ))}
@@ -100,7 +108,7 @@ export default function ResourcesPage() {
               <p className="text-muted-foreground mb-6">
                 {searchQuery ? "No resources match your search criteria." : "No resources have been shared yet."}
               </p>
-              <Button onClick={() => setIsUploaderOpen(true)}>Upload Resource</Button>
+              <Button onClick={() => setIsUploaderOpen(true)} className="w-full sm:w-auto">Upload Resource</Button>
             </div>
           )}
         </TabsContent>
@@ -112,7 +120,7 @@ export default function ResourcesPage() {
               <p className="mt-4 text-lg">Loading documents...</p>
             </div>
           ) : documentResources && documentResources.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {documentResources.map((resource) => (
                 <ResourceCard key={resource.id} resource={resource} />
               ))}
@@ -126,7 +134,7 @@ export default function ResourcesPage() {
                   ? "No documents match your search criteria."
                   : "No document resources have been shared yet."}
               </p>
-              <Button onClick={() => setIsUploaderOpen(true)}>Upload Document</Button>
+              <Button onClick={() => setIsUploaderOpen(true)} className="w-full sm:w-auto">Upload Document</Button>
             </div>
           )}
         </TabsContent>
@@ -138,7 +146,7 @@ export default function ResourcesPage() {
               <p className="mt-4 text-lg">Loading presentations...</p>
             </div>
           ) : presentationResources && presentationResources.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {presentationResources.map((resource) => (
                 <ResourceCard key={resource.id} resource={resource} />
               ))}
@@ -152,7 +160,7 @@ export default function ResourcesPage() {
                   ? "No presentations match your search criteria."
                   : "No presentation resources have been shared yet."}
               </p>
-              <Button onClick={() => setIsUploaderOpen(true)}>Upload Presentation</Button>
+              <Button onClick={() => setIsUploaderOpen(true)} className="w-full sm:w-auto">Upload Presentation</Button>
             </div>
           )}
         </TabsContent>
@@ -164,7 +172,7 @@ export default function ResourcesPage() {
               <p className="mt-4 text-lg">Loading images...</p>
             </div>
           ) : imageResources && imageResources.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {imageResources.map((resource) => (
                 <ResourceCard key={resource.id} resource={resource} />
               ))}
@@ -176,7 +184,7 @@ export default function ResourcesPage() {
               <p className="text-muted-foreground mb-6">
                 {searchQuery ? "No images match your search criteria." : "No image resources have been shared yet."}
               </p>
-              <Button onClick={() => setIsUploaderOpen(true)}>Upload Image</Button>
+              <Button onClick={() => setIsUploaderOpen(true)} className="w-full sm:w-auto">Upload Image</Button>
             </div>
           )}
         </TabsContent>
@@ -188,7 +196,7 @@ export default function ResourcesPage() {
               <p className="mt-4 text-lg">Loading code files...</p>
             </div>
           ) : codeResources && codeResources.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {codeResources.map((resource) => (
                 <ResourceCard key={resource.id} resource={resource} />
               ))}
@@ -200,7 +208,7 @@ export default function ResourcesPage() {
               <p className="text-muted-foreground mb-6">
                 {searchQuery ? "No code files match your search criteria." : "No code resources have been shared yet."}
               </p>
-              <Button onClick={() => setIsUploaderOpen(true)}>Upload Code File</Button>
+              <Button onClick={() => setIsUploaderOpen(true)} className="w-full sm:w-auto">Upload Code File</Button>
             </div>
           )}
         </TabsContent>
@@ -208,58 +216,78 @@ export default function ResourcesPage() {
 
       <ResourceUploader open={isUploaderOpen} onOpenChange={setIsUploaderOpen} />
     </DashboardLayout>
-  )
+  );
 }
 
 function ResourceCard({ resource }) {
   const getFileIcon = (type) => {
     switch (type) {
       case "pdf":
-        return <FileText className="h-8 w-8 text-muted-foreground" />
+        return <FileText className="h-10 w-10 text-red-500" />;
+      case "doc":
+      case "docx":
+        return <FileText className="h-10 w-10 text-blue-500" />;
       case "ppt":
       case "pptx":
-        return <FileImage className="h-8 w-8 text-muted-foreground" />
+        return <FileText className="h-10 w-10 text-orange-500" />;
       case "jpg":
       case "png":
       case "gif":
       case "svg":
-        return <FileImage className="h-8 w-8 text-muted-foreground" />
+        return <FileImage className="h-10 w-10 text-green-500" />;
       case "js":
       case "html":
       case "css":
       case "py":
       case "java":
-        return <FileCode className="h-8 w-8 text-muted-foreground" />
+        return <FileCode className="h-10 w-10 text-yellow-500" />;
       default:
-        return <File className="h-8 w-8 text-muted-foreground" />
+        return <File className="h-10 w-10 text-gray-500" />;
     }
-  }
+  };
 
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex justify-between">
-          <CardTitle>{resource.title}</CardTitle>
+    <Card className="overflow-hidden">
+      <CardHeader className="pb-2">
+        <div className="flex items-start gap-3">
+          {getFileIcon(resource.type)}
+          <div className="flex-1 min-w-0">
+            <CardTitle className="text-lg truncate">{resource.title}</CardTitle>
+            <CardDescription>
+              <Badge variant="outline" className="mr-2">
+                {resource.type.toUpperCase()}
+              </Badge>
+              {resource.fileSize}
+            </CardDescription>
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between text-sm text-muted-foreground">
+          <span>Uploaded by {resource.uploadedBy}</span>
+          <span>{resource.uploadedAt}</span>
+        </div>
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2 mt-4">
+          <Button variant="outline" className="flex-1 gap-1 w-full sm:w-auto">
+            <Download className="h-4 w-4" />
+            Download
+          </Button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="icon">
+              <Button variant="outline" size="icon" className="w-full sm:w-auto">
                 <MoreHorizontal className="h-4 w-4" />
+                <span className="sr-only">More options</span>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuItem>Download</DropdownMenuItem>
-              <DropdownMenuItem>Delete</DropdownMenuItem>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem>Preview</DropdownMenuItem>
+              <DropdownMenuItem>Share</DropdownMenuItem>
+              <DropdownMenuItem>Add to Favorites</DropdownMenuItem>
+              <DropdownMenuItem>View Details</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-        <CardDescription>{resource.uploadedBy}</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="flex flex-col items-center">
-          {getFileIcon(resource.type)}
-          <Badge variant="outline" className="mt-2">{resource.type}</Badge>
-        </div>
       </CardContent>
     </Card>
-  )
+  );
 }

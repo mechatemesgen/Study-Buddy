@@ -182,7 +182,7 @@ export default function SessionsPage() {
         </TabsContent>
 
         <TabsContent value="date" className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-[300px_1fr] gap-6">
+          <div className="space-y-6">
             <Card>
               <CardHeader>
                 <CardTitle>Select Date</CardTitle>
@@ -254,9 +254,6 @@ export default function SessionsPage() {
                     <p className="text-muted-foreground mb-6">
                       There are no study sessions scheduled for {formatDate(selectedDate)}.
                     </p>
-                    <Button asChild>
-                      <Link to="/dashboard/sessions/schedule">Schedule a Session</Link>
-                    </Button>
                   </div>
                 )}
               </CardContent>

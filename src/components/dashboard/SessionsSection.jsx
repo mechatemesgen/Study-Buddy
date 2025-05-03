@@ -58,19 +58,19 @@ export function SessionsSection({ sessions = [], isLoading }) {
     : []
 
   return (
-    <div className="card">
+    <div className="card space-y-6 md:space-y-8 lg:space-y-10">
       <div className="card-header">
-        <div className="flex justify-between items-center">
-          <span>Upcoming Sessions</span>
-          <Button size="sm" asChild className="mt-2">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center space-y-4 md:space-y-0">
+          <span className="text-lg font-semibold">Upcoming Sessions</span>
+          <Button size="sm" asChild className="mt-2 md:mt-0">
             <Link to="/dashboard/sessions/schedule">
               <Plus className="h-4 w-4 mr-1" /> Schedule
             </Link>
           </Button>
         </div>
-        <div>Your study sessions for the next 7 days</div>
+        <div className="text-sm text-muted-foreground">Your study sessions for the next 7 days</div>
       </div>
-      <div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {upcomingSessions.length > 0 ? (
           <div className="space-y-4">
             {upcomingSessions.map((session) => (
@@ -87,6 +87,11 @@ export function SessionsSection({ sessions = [], isLoading }) {
             <Button asChild className="mt-4">
               <Link to="/dashboard/sessions/schedule">Schedule a Session</Link>
             </Button>
+          </div>
+        )}
+        {upcomingSessions.length > 0 && (
+          <div className="hidden lg:block">
+            <Calendar />
           </div>
         )}
       </div>

@@ -46,11 +46,11 @@ export function DashboardLayout({ children }) {
       </header>
 
       <div className="flex flex-1">
-        <div className="hidden md:flex">
+        <div className="hidden md:flex fixed h-full w-64">
           <Sidebar />
         </div>
 
-        <main className="flex-1 container py-6 px-4 sm:px-6 md:px-8">
+        <main className="flex-1 container py-6 px-4 sm:px-6 md:px-8 md:pb-0 pb-20 md:ml-64" style={{ paddingBottom: '3rem', marginBottom: '3rem' }}>
           {children}
         </main>
       </div>

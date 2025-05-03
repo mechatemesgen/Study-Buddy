@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Input } from "@/components/ui/input"
 import { useToast } from "@/components/ui/toast"
 import { Moon, Sun, Laptop, Shield, Key, LogOut } from "lucide-react"
+import { useTheme } from "next-themes"; // Correct import for useTheme
 
 export default function SettingsPage() {
   const { toast } = useToast()
@@ -26,6 +27,7 @@ export default function SettingsPage() {
     showEmail: false,
     showActivity: true,
   })
+  const { theme, setTheme } = useTheme() // Access theme and setter from context
 
   const handleNotificationChange = (setting) => {
     setNotificationSettings((prev) => ({
@@ -173,7 +175,7 @@ export default function SettingsPage() {
                 <div>
                   <Label className="font-medium">Theme</Label>
                   <p className="text-sm text-muted-foreground mb-4">Select your preferred theme</p>
-                  <RadioGroup defaultValue="light" onValueChange={() => {}} className="grid grid-cols-3 gap-4">
+                  <RadioGroup defaultValue={theme} onValueChange={setTheme} className="grid grid-cols-3 gap-4">
                     <div>
                       <RadioGroupItem value="light" id="theme-light" className="peer sr-only" />
                       <Label
