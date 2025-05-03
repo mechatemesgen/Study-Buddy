@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
-import { useAuth } from "../hooks/use-auth"; 
-import { DashboardLayout } from "../components/dashboard/DashboardLayout"; 
-import { SearchBar } from "../components/dashboard/SearchBar"; 
-import { GroupsSection } from "../components/dashboard/GroupsSection"; 
-import { SessionsSection } from "../components/dashboard/SessionsSection";
-import { ResourcesSection } from "../components/dashboard/ResourcesSection"; 
-import { useGroups } from "../hooks/useGroups"; 
-import { useSessions } from "../hooks/useSessions"; 
-import { useResources } from "../hooks/useResources"; 
+import { useAuth } from "../../hooks/use-auth"; 
+import { DashboardLayout } from "../../components/dashboard/DashboardLayout"; 
+import { SearchBar } from "../../components/dashboard/SearchBar"; 
+import { GroupsSection } from "../../components/dashboard/GroupsSection"; 
+import { SessionsSection } from "../../components/dashboard/SessionsSection";
+import { ResourcesSection } from "../../components/dashboard/ResourcesSection"; 
+import { useGroups } from "../../hooks/useGroups"; 
+import { useSessions } from "../../hooks/useSessions"; 
+import { useResources } from "../../hooks/useResources"; 
 
 export default function DashboardPage() {
   const { user } = useAuth();

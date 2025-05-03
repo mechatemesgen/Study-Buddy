@@ -1,4 +1,3 @@
-// src/routes/AppRoutes.jsx
 import { Routes, Route, Navigate } from 'react-router-dom'
 import MainLayout from '../layouts/MainLayout'
 import DashboardLayout from '../layouts/DashboardLayout'
@@ -6,7 +5,7 @@ import HomePage from '../pages/HomePage'
 import AboutPage from '../pages/AboutPage'
 import LoginPage from '../pages/LoginPage'
 import SignupPage from '../pages/SignupPage'
-import Dashboard from '../pages/Dashboard'
+import Dashboard from '../pages/dashboard/Dashboard'
 import PageNotFound from '../pages/PageNotFound'
 import { useAuth } from '../hooks/use-auth'
 import ContactUs from '@/pages/ContactUs'
