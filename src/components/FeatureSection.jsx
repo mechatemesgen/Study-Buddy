@@ -1,4 +1,5 @@
 import { Calendar, Users, Clock, FileText } from "lucide-react"
+import { motion } from "framer-motion"
 
 export function FeatureSection() {
   const features = [
@@ -17,7 +18,8 @@ export function FeatureSection() {
     {
       icon: Clock,
       title: "Session Scheduling & Reminders",
-      description: "Schedule study sessions and receive timely reminders to never miss an important study meeting.",
+      description:
+        "Schedule study sessions and receive timely reminders to never miss an important study meeting.",
     },
     {
       icon: FileText,
@@ -46,16 +48,20 @@ export function FeatureSection() {
           {features.map((feature, index) => {
             const Icon = feature.icon
             return (
-              <div
+              <motion.div
                 key={index}
                 className="flex flex-col items-center space-y-4 rounded-lg border p-6 shadow-sm transition-all hover:shadow-md"
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.2 }}
+                viewport={{ once: true, amount: 0.2 }}
               >
                 <div className="rounded-full bg-primary/10 p-3">
                   <Icon className="h-6 w-6 text-primary" />
                 </div>
                 <h3 className="text-xl font-bold">{feature.title}</h3>
                 <p className="text-center text-gray-500">{feature.description}</p>
-              </div>
+              </motion.div>
             )
           })}
         </div>
