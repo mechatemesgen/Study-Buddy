@@ -1,12 +1,12 @@
 /**
- * API Configuration
+ * API Configuration for React + Vite
  *
  * This file contains all API endpoints and configuration settings.
- * Modify this file to point to your actual backend endpoints when ready.
+ * It uses import.meta.env to access environment variables (Vite-style).
  */
 
-// Base API URL - change this to your actual backend URL when deploying
-export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://api.studybuddy.example.com"
+// Base API URL - change this in .env as: VITE_API_URL=https://your-api.com
+export const API_BASE_URL = import.meta.env.VITE_API_URL || "https://api.studybuddy.example.com";
 
 // Authentication endpoints
 export const AUTH_ENDPOINTS = {
@@ -16,7 +16,7 @@ export const AUTH_ENDPOINTS = {
   REFRESH_TOKEN: "/auth/refresh-token",
   FORGOT_PASSWORD: "/auth/forgot-password",
   RESET_PASSWORD: "/auth/reset-password",
-}
+};
 
 // User endpoints
 export const USER_ENDPOINTS = {
@@ -26,7 +26,7 @@ export const USER_ENDPOINTS = {
   NOTIFICATIONS: "/users/notifications",
   MARK_NOTIFICATION_READ: (id) => `/users/notifications/${id}/read`,
   MARK_ALL_NOTIFICATIONS_READ: "/users/notifications/read-all",
-}
+};
 
 // Group endpoints
 export const GROUP_ENDPOINTS = {
@@ -44,7 +44,7 @@ export const GROUP_ENDPOINTS = {
     SEND: (id) => `/groups/${id}/messages`,
     READ: (id, messageId) => `/groups/${id}/messages/${messageId}/read`,
   },
-}
+};
 
 // Session endpoints
 export const SESSION_ENDPOINTS = {
@@ -56,7 +56,7 @@ export const SESSION_ENDPOINTS = {
   JOIN: (id) => `/sessions/${id}/join`,
   LEAVE: (id) => `/sessions/${id}/leave`,
   GROUP_SESSIONS: (groupId) => `/groups/${groupId}/sessions`,
-}
+};
 
 // Resource endpoints
 export const RESOURCE_ENDPOINTS = {
@@ -70,16 +70,16 @@ export const RESOURCE_ENDPOINTS = {
   SHARE: (id) => `/resources/${id}/share`,
   FAVORITE: (id) => `/resources/${id}/favorite`,
   GROUP_RESOURCES: (groupId) => `/groups/${groupId}/resources`,
-}
+};
 
 // WebSocket endpoints
 export const WEBSOCKET_ENDPOINTS = {
   CHAT: (groupId) => `/ws/chat/${groupId}`,
   NOTIFICATIONS: "/ws/notifications",
-}
+};
 
 // Mock data delay (for development only)
-export const MOCK_DELAY = 800
+export const MOCK_DELAY = 800;
 
 // File upload configuration
 export const UPLOAD_CONFIG = {
@@ -90,10 +90,10 @@ export const UPLOAD_CONFIG = {
     IMAGES: [".jpg", ".jpeg", ".png", ".gif"],
     CODE: [".js", ".html", ".css", ".py", ".java"],
   },
-}
+};
 
 // Default pagination settings
 export const PAGINATION = {
   DEFAULT_PAGE_SIZE: 10,
   MAX_PAGE_SIZE: 50,
-}
+};

@@ -8,15 +8,15 @@ const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 const mockUsers = [
   {
     id: "1",
-    name: "John Doe",
-    email: "john@example.com",
-    password: "password123",
+    name: "Mecha Temesgen",
+    email: "ililnaafbarihe94@proton.me",
+    password: "123456",
     avatar: "",
   },
   {
     id: "2",
-    name: "Jane Smith",
-    email: "jane@example.com",
+    name: "Eba Smith",
+    email: "ebae@example.com",
     password: "password123",
     avatar: "",
   },

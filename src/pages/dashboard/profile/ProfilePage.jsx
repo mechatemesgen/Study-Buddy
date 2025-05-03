@@ -24,6 +24,7 @@ export default function ProfilePage() {
     major: user?.major || "",
     graduationYear: user?.graduationYear || "",
     interests: user?.interests || "",
+    avatar: user?.avatar || "/placeholder.svg",
   })
 
   const handleChange = (e) => {
@@ -103,7 +104,7 @@ export default function ProfilePage() {
             <CardHeader className="pb-2">
               <div className="flex flex-col md:flex-row gap-6 items-start md:items-center">
                 <Avatar className="h-24 w-24">
-                  <AvatarImage src={user?.avatar || "/placeholder.svg"} alt={user?.name} />
+                  <AvatarImage src={profileData.avatar} alt={user?.name} />
                   <AvatarFallback className="text-2xl">{user?.name?.substring(0, 2).toUpperCase()}</AvatarFallback>
                 </Avatar>
                 <div>
@@ -185,12 +186,65 @@ export default function ProfilePage() {
                 <div className="flex flex-col md:flex-row gap-6 items-start">
                   <div className="flex flex-col items-center gap-2">
                     <Avatar className="h-24 w-24">
-                      <AvatarImage src={user?.avatar || "/placeholder.svg"} alt={user?.name} />
+                      <AvatarImage src={profileData.avatar} alt={user?.name} />
                       <AvatarFallback className="text-2xl">{user?.name?.substring(0, 2).toUpperCase()}</AvatarFallback>
                     </Avatar>
-                    <Button variant="outline" size="sm" className="mt-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="mt-2"
+                      onClick={() => document.getElementById('avatarInput').click()}
+                    >
                       Change Avatar
                     </Button>
+                    <input
+                      id="avatarInput"
+                      type="file"
+                      className="hidden"
+                      accept="image/*"
+                      onChange={async (e) => {
+                        const file = e.target.files[0];
+                        if (!file) return;
+
+                        setIsLoading(true);
+                        const formData = new FormData();
+                        formData.append('avatar', file);
+
+                        try {
+                          const response = await fetch('/api/user/avatar', {
+                            method: 'POST',
+                            body: formData,
+                            headers: {
+                              Authorization: `Bearer ${user.token}`,
+                            },
+                          });
+
+                          if (!response.ok) {
+                            throw new Error('Failed to upload avatar');
+                          }
+
+                          const data = await response.json();
+                          if (data.avatarUrl) {
+                            setProfileData((prev) => ({ ...prev, avatar: data.avatarUrl }));
+                          } else {
+                            throw new Error('Avatar URL not returned');
+                          }
+
+                          toast({
+                            title: 'Avatar updated',
+                            description: 'Your avatar has been updated successfully.',
+                          });
+                        } catch (error) {
+                          toast({
+                            title: 'Failed to update avatar',
+                            description: error.message || 'There was an error updating your avatar. Please try again.',
+                            variant: 'destructive',
+                          });
+                        } finally {
+                          setIsLoading(false);
+                        }
+                      }}
+                    />
                   </div>
                   <div className="flex-1 space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
