@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react"
 import { useParams } from "react-router-dom"
-import DashboardLayout from "@/components/dashboard/DashboardLayout"
+import {DashboardLayout} from "@/components/dashboard/DashboardLayout"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -8,7 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { ScrollArea } from "@/components/ui/ScrollArea"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/Tooltip"
 import { useToast } from "@/components/ui/toast"
-import useGroup from "@/hooks/use-group"
+import {useGroup} from "@/hooks/use-group"
 import { fetchGroupChat, sendMessage, deleteMessage } from "@/api/chat"
 import { formatRelativeTime } from "@/lib/utils"
 import { Paperclip, Send, MoreVertical, FileText, FileImage, Download, Trash2 } from "lucide-react"
@@ -66,7 +66,11 @@ export default function GroupChatPage() {
       setMessages((prev) => [...prev, sentMessage])
       setNewMessage("")
       setAttachments([])
-    } catch {
+      toast({
+        title: "Message sent",
+        description: "Your message has been sent successfully.",
+      })
+    } catch (error) {
       toast({
         title: "Failed to send message",
         description: "There was an error sending your message. Please try again.",

@@ -10,17 +10,40 @@ import { ResourceList } from "@/components/ResourceList"
 import { MemberList } from "@/components/MemberList"
 import { SessionScheduler } from "@/components/SessionScheduler"
 import { ResourceUploader } from "@/components/ResourceUploader"
-import { useGroup } from "@/hooks/use-group"
 import { useGroupSessions } from "@/hooks/use-group-sessions"
 import { useGroupResources } from "@/hooks/use-group-resources"
+import { fetchGroup } from "@/api/groups"
+import { toast } from "@/components/ui/toast"
 
 export default function GroupDetailPage() {
   const { id } = useParams()
-  const { group, isLoading } = useGroup(id)
+  const [group, setGroup] = useState(null)
+  const [isLoading, setIsLoading] = useState(true)
   const { sessions } = useGroupSessions(id)
   const { resources } = useGroupResources(id)
   const [isSchedulerOpen, setIsSchedulerOpen] = useState(false)
   const [isUploaderOpen, setIsUploaderOpen] = useState(false)
+
+  useEffect(() => {
+    const loadGroupData = async () => {
+      try {
+        const groupData = await fetchGroup(id)
+        setGroup(groupData)
+      } catch (error) {
+        toast({
+          title: "Error loading group",
+          description: "There was a problem loading the group details. Please try again.",
+          variant: "destructive",
+        })
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    if (id) {
+      loadGroupData()
+    }
+  }, [id, toast])
 
   if (isLoading) {
     return (

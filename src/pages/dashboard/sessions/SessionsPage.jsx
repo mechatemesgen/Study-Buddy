@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -11,11 +11,34 @@ import { useSessions } from "@/hooks/use-sessions"
 import { formatDate, formatTime } from "@/lib/utils"
 import { Calendar as CalendarComponent } from "@/components/ui/Calendar"
 import { StudyCalendar } from "@/components/StudyCalendar"
+import { toast } from "@/components/ui/toast"
+import { fetchSessions } from "@/lib/api"
 
 export default function SessionsPage() {
-  const { sessions, isLoading } = useSessions()
+  const [sessions, setSessions] = useState([])
+  const [isLoading, setIsLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedDate, setSelectedDate] = useState(new Date())
+
+  // Add error handling for session data fetching and improve loading state management
+  useEffect(() => {
+    const loadSessions = async () => {
+      try {
+        const sessionData = await fetchSessions()
+        setSessions(sessionData)
+      } catch (error) {
+        toast({
+          title: "Error loading sessions",
+          description: "There was a problem loading the sessions. Please try again.",
+          variant: "destructive",
+        })
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    loadSessions()
+  }, [toast])
 
   // Filter sessions based on search query
   const filteredSessions = searchQuery

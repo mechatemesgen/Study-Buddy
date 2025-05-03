@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { useHistory } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -17,7 +17,7 @@ import { CalendarIcon, Clock, ArrowLeft } from "lucide-react"
 import { cn, formatDate } from "@/lib/utils"
 
 export default function ScheduleSessionPage() {
-  const history = useHistory()
+  const navigate = useNavigate()
   const { toast } = useToast()
   const { groups } = useGroups()
   const [isLoading, setIsLoading] = useState(false)
@@ -100,7 +100,7 @@ export default function ScheduleSessionPage() {
       })
 
       // Redirect to sessions page
-      history.push("/dashboard/sessions")
+      navigate("/dashboard/sessions")
     } catch (error) {
       toast({
         title: "Failed to schedule session",
@@ -115,7 +115,7 @@ export default function ScheduleSessionPage() {
   return (
     <DashboardLayout>
       <div className="flex items-center gap-2 mb-6">
-        <Button variant="ghost" size="icon" onClick={() => history.goBack()}>
+        <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
           <ArrowLeft className="h-5 w-5" />
         </Button>
         <h1 className="text-3xl font-bold">Schedule a Study Session</h1>

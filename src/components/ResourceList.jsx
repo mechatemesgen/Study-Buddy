@@ -6,7 +6,6 @@ import {
   Download,
   FileImage,
   File as FileGeneric,
-  FilePresentation as FilePresentationIcon,
 } from "lucide-react"
 import { formatDate } from "../lib/utils"
 
@@ -35,12 +34,12 @@ export function ResourceList({ resources = [] }) {
         return <FileText className="h-10 w-10 text-blue-500" />
       case "ppt":
       case "pptx":
-        return <FilePresentationIcon className="h-10 w-10 text-orange-500" />
+        return <FileText className="h-10 w-10 text-orange-500" />
       case "jpg":
       case "png":
-        return <FileImage className="h-10 w-10 text-green-500" />
+        return <FileText className="h-10 w-10 text-green-500" />
       default:
-        return <FileGeneric className="h-10 w-10 text-gray-500" />
+        return <FileText className="h-10 w-10 text-gray-500" />
     }
   }
 

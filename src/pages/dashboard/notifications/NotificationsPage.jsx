@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/Tabs";
 import { Badge } from "@/components/ui/Badge";
 import { Bell, Search, CheckCircle, Calendar, MessageSquare, FileText, Users } from "lucide-react";
+import { toast } from "@/components/ui/toast";
 
 export default function NotificationsPage() {
   const [notifications, setNotifications] = useState([]);
@@ -113,12 +114,25 @@ export default function NotificationsPage() {
 
   const unreadCount = notifications.filter((n) => !n.read).length;
 
-  const markAsRead = (id) => {
-    setNotifications((prev) =>
-      prev.map((notification) =>
-        notification.id === id ? { ...notification, read: true } : notification
-      )
-    );
+  const markAsRead = async (notificationId) => {
+    try {
+      await updateNotificationStatus(notificationId, { read: true });
+      setNotifications((prev) =>
+        prev.map((notification) =>
+          notification.id === notificationId ? { ...notification, read: true } : notification
+        )
+      );
+      toast({
+        title: "Notification marked as read",
+        description: "The notification has been successfully marked as read.",
+      });
+    } catch (error) {
+      toast({
+        title: "Failed to mark as read",
+        description: "There was an error marking the notification as read. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const markAllAsRead = () => {
