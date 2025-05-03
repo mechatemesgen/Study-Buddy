@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Home, Users, Calendar, FileText, User } from "lucide-react";
+import { Home, Users, Calendar, FileText, User, Settings } from "lucide-react";
 import clsx from "clsx"; // Utility for combining class names
 
 export function MobileNav() {
@@ -12,6 +12,8 @@ export function MobileNav() {
     { href: "/dashboard/sessions", label: "Sessions", icon: Calendar },
     { href: "/dashboard/resources", label: "Resources", icon: FileText },
     { href: "/dashboard/profile", label: "Profile", icon: User },
+    { href: "/dashboard/settings", label: "Settings", icon: Settings },
+  // 
   ];
 
   return (

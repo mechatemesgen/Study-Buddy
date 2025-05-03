@@ -62,7 +62,7 @@ export function SessionsSection({ sessions = [], isLoading }) {
       <div className="card-header">
         <div className="flex justify-between items-center">
           <span>Upcoming Sessions</span>
-          <Button size="sm" asChild>
+          <Button size="sm" asChild className="mt-2">
             <Link to="/dashboard/sessions/schedule">
               <Plus className="h-4 w-4 mr-1" /> Schedule
             </Link>
@@ -84,7 +84,7 @@ export function SessionsSection({ sessions = [], isLoading }) {
             <p className="text-muted-foreground mb-4 max-w-md">
               No upcoming sessions scheduled for the next 7 days. Schedule a new study session to get started.
             </p>
-            <Button asChild>
+            <Button asChild className="mt-4">
               <Link to="/dashboard/sessions/schedule">Schedule a Session</Link>
             </Button>
           </div>
@@ -92,7 +92,7 @@ export function SessionsSection({ sessions = [], isLoading }) {
       </div>
       {upcomingSessions.length > 0 && (
         <div>
-          <Button variant="outline" asChild className="w-full">
+          <Button variant="outline" asChild className="w-full mt-4">
             <Link to="/dashboard/sessions">View All Sessions</Link>
           </Button>
         </div>

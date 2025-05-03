@@ -61,8 +61,8 @@ export default function DashboardPage() {
 
   return (
     <DashboardLayout>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl md:text-3xl font-bold">
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between space-y-4 md:space-y-0 mb-6">
+        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold">
           Welcome back, {user?.name?.split(" ")[0] || "User"}!
         </h1>
         <SearchBar onSearch={handleSearch} />

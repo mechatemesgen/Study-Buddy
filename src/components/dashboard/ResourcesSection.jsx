@@ -46,7 +46,7 @@ export function ResourcesSection({ resources = [], isLoading }) {
       <CardHeader>
         <CardTitle className="flex justify-between items-center">
           <span>Recent Resources</span>
-          <Button size="sm" onClick={() => setIsUploaderOpen(true)}>
+          <Button size="sm" onClick={() => setIsUploaderOpen(true)} className="mt-2">
             <Upload className="h-4 w-4 mr-1" /> Upload
           </Button>
         </CardTitle>
@@ -66,13 +66,13 @@ export function ResourcesSection({ resources = [], isLoading }) {
             <p className="text-muted-foreground mb-4 max-w-md">
               No resources shared yet. Upload your first resource to share with your groups.
             </p>
-            <Button onClick={() => setIsUploaderOpen(true)}>Upload Resource</Button>
+            <Button onClick={() => setIsUploaderOpen(true)} className="mt-4">Upload Resource</Button>
           </div>
         )}
       </CardContent>
       {resources && resources.length > 0 && (
         <CardFooter>
-          <Button variant="outline" asChild className="w-full">
+          <Button variant="outline" asChild className="w-full mt-4">
             <Link to="/dashboard/resources">View All Resources</Link>
           </Button>
         </CardFooter>

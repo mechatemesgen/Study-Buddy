@@ -5,9 +5,9 @@ export default function DashboardLayout() {
   return (
     <SidebarProvider>
       <div className="flex">
-        <Sidebar />
+        {/* <Sidebar /> */}
         <div className="flex-1">
-          <Outlet /> {/* This will render the Dashboard component */}
+          <Outlet /> 
         </div>
       </div>
     </SidebarProvider>

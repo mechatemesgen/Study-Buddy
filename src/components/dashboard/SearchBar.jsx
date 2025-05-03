@@ -12,7 +12,7 @@ export function SearchBar({ onSearch }) {
   };
 
   return (
-    <div className="relative max-w-xs w-full">
+    <div className="relative max-w-xs w-full mb-4 md:mb-0">
       <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
       <Input
         type="search"
