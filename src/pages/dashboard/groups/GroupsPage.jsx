@@ -1,12 +1,12 @@
 import { useState } from "react";
-import { DashboardLayout } from "@/components/dashboard/dashboard-layout";
+import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/Tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { CreateGroupDialog } from "@/components/create-group-dialog";
+import { Badge } from "@/components/ui/Badge";
+import { CreateGroupDialog } from "@/components/CreateGroupDialog";
 import { useGroups } from "@/hooks/use-groups";
 import { Users, Search, Plus, MessageSquare, MoreHorizontal } from "lucide-react";
 import { Link } from "react-router-dom";

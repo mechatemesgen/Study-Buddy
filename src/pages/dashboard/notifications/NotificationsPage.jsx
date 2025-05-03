@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
-import { DashboardLayout } from "@/components/dashboard/dashboard-layout";
+import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/Tabs";
+import { Badge } from "@/components/ui/Badge";
 import { Bell, Search, CheckCircle, Calendar, MessageSquare, FileText, Users } from "lucide-react";
 
 export default function NotificationsPage() {

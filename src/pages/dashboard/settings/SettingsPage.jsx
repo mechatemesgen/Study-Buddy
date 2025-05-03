@@ -1,20 +1,18 @@
 import { useState } from "react"
-import { DashboardLayout } from "@/components/dashboard/dashboard-layout"
+import { DashboardLayout } from "@/components/dashboard/DashboardLayout"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/Tabs"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/RadioGroup"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
-import { useToast } from "@/components/ui/use-toast"
-import { useTheme } from "@/contexts/theme-context" // Custom theme context for Vite
+import { useToast } from "@/components/ui/toast"
 import { Moon, Sun, Laptop, Shield, Key, LogOut } from "lucide-react"
 
 export default function SettingsPage() {
   const { toast } = useToast()
-  const { theme, setTheme } = useTheme()
   const [isLoading, setIsLoading] = useState(false)
   const [notificationSettings, setNotificationSettings] = useState({
     emailNotifications: true,
@@ -175,7 +173,7 @@ export default function SettingsPage() {
                 <div>
                   <Label className="font-medium">Theme</Label>
                   <p className="text-sm text-muted-foreground mb-4">Select your preferred theme</p>
-                  <RadioGroup defaultValue={theme} onValueChange={setTheme} className="grid grid-cols-3 gap-4">
+                  <RadioGroup defaultValue="light" onValueChange={() => {}} className="grid grid-cols-3 gap-4">
                     <div>
                       <RadioGroupItem value="light" id="theme-light" className="peer sr-only" />
                       <Label

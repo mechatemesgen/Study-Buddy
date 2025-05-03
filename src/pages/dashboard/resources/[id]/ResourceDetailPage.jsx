@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
 import { useParams, useNavigate } from "react-router-dom"
-import { useToast } from "@/components/ui/use-toast"
+import { useToast } from "@/components/ui/toast"
 import { fetchResource, downloadResource, toggleFavorite, shareResource, previewResource } from "@/api/resources"
 
 export default function ResourceDetailPage() {

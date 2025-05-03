@@ -1,14 +1,14 @@
 import React, { useState } from "react"
-import { DashboardLayout } from "./components/dashboard/dashboard-layout"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./components/ui/card"
-import { Button } from "./components/ui/button"
-import { Input } from "./components/ui/input"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "./components/ui/tabs"
-import { Badge } from "./components/ui/badge"
-import { ResourceUploader } from "./components/resource-uploader"
-import { useResources } from "./hooks/use-resources"
+import { DashboardLayout } from "@/components/dashboard/DashboardLayout"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/Tabs"
+import { Badge } from "@/components/ui/Badge"
+import { ResourceUploader } from "@/components/ResourceUploader"
+import { useResources } from "@/hooks/use-resources"
 import { FileText, FileImage, FileCode, File, Search, Upload, Download, MoreHorizontal } from "lucide-react"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./components/ui/dropdown-menu"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 
 export default function ResourcesPage() {
   const { resources, isLoading } = useResources()

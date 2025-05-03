@@ -1,16 +1,16 @@
 import { useState } from "react"
 import { Link } from "react-router-dom"
-import { DashboardLayout } from "@/components/dashboard/dashboard-layout"
+import { DashboardLayout } from "@/components/dashboard/DashboardLayout"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Badge } from "@/components/ui/badge"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/Tabs"
+import { Badge } from "@/components/ui/Badge"
 import { CalendarIcon, Clock, Search, Plus, Video, Users } from "lucide-react"
 import { useSessions } from "@/hooks/use-sessions"
 import { formatDate, formatTime } from "@/lib/utils"
-import { Calendar as CalendarComponent } from "@/components/ui/calendar"
-import { StudyCalendar } from "@/components/study-calendar"
+import { Calendar as CalendarComponent } from "@/components/ui/Calendar"
+import { StudyCalendar } from "@/components/StudyCalendar"
 
 export default function SessionsPage() {
   const { sessions, isLoading } = useSessions()
