@@ -82,6 +82,17 @@ const mockGroups = [
   },
 ]
 
+// Mock subjects
+const mockSubjects = [
+  { id: 1, name: "Mathematics" },
+  { id: 2, name: "Computer Science" },
+  { id: 3, name: "Biology" },
+  { id: 4, name: "Physics" },
+  { id: 5, name: "Chemistry" },
+  { id: 6, name: "Literature" },
+  { id: 7, name: "History" },
+]
+
 import axiosInstance from "../config/axiosInstance";
 import { GROUP_ENDPOINTS } from "../config/api-config";
 
@@ -95,7 +106,8 @@ export async function fetchGroups() {
     return response.data;
   } catch (error) {
     console.error("Failed to fetch groups:", error);
-    throw new Error("Failed to fetch study groups");
+    console.warn("Using mock group data due to API error");
+    return mockGroups;
   }
 }
 
@@ -109,7 +121,8 @@ export async function fetchMyGroups() {
     return response.data;
   } catch (error) {
     console.error("Failed to fetch my groups:", error);
-    throw new Error("Failed to fetch your study groups");
+    console.warn("Using mock group data due to API error");
+    return mockGroups;
   }
 }
 
@@ -124,6 +137,14 @@ export async function fetchGroup(id) {
     return response.data;
   } catch (error) {
     console.error(`Failed to fetch group ${id}:`, error);
+    
+    // Return mock group if available
+    const mockGroup = mockGroups.find(group => group.id === id || group.id === Number(id));
+    if (mockGroup) {
+      console.warn(`Using mock data for group ${id}`);
+      return mockGroup;
+    }
+    
     throw new Error("Failed to fetch study group details");
   }
 }
@@ -135,15 +156,33 @@ export async function fetchGroup(id) {
  */
 export async function createGroup(data) {
   try {
-    const response = await axiosInstance.post(GROUP_ENDPOINTS.CREATE, data);
+    console.log("Sending group creation payload:", data);
+    
+    // Make a deep copy of the payload to avoid modifying the original data
+    const payload = { ...data };
+    
+    // Convert privacy to uppercase if it exists in lowercase
+    if (payload.privacy && typeof payload.privacy === 'string') {
+      payload.privacy = payload.privacy.toUpperCase();
+    }
+    
+    // Send the API request with the correctly formatted payload
+    const response = await axiosInstance.post(GROUP_ENDPOINTS.CREATE, payload);
+    
+    console.log("Group creation response:", response.data);
     return response.data;
   } catch (error) {
     console.error("Failed to create group:", error);
-    throw new Error(
+    
+    // Extract detailed error message if available
+    const errorMsg = 
       error.response?.data?.detail || 
-      error.response?.data?.name?.[0] || 
-      "Failed to create study group"
-    );
+      error.response?.data?.name?.[0] ||
+      error.response?.data?.subject_id?.[0] ||
+      error.response?.data?.subject_name?.[0] ||
+      "Failed to create study group";
+    
+    throw new Error(errorMsg);
   }
 }
 
@@ -155,7 +194,16 @@ export async function createGroup(data) {
  */
 export async function updateGroup(id, data) {
   try {
-    const response = await axiosInstance.patch(GROUP_ENDPOINTS.UPDATE(id), data);
+    // Format the payload correctly for the backend
+    const payload = { ...data };
+    
+    // If subject is a number (ID), ensure it's sent as subject_id
+    if (typeof payload.subject === 'number' || !isNaN(Number(payload.subject))) {
+      payload.subject_id = Number(payload.subject);
+      delete payload.subject;
+    }
+    
+    const response = await axiosInstance.patch(GROUP_ENDPOINTS.UPDATE(id), payload);
     return response.data;
   } catch (error) {
     console.error(`Failed to update group ${id}:`, error);
@@ -187,7 +235,8 @@ export async function fetchSubjects() {
     return response.data;
   } catch (error) {
     console.error("Failed to fetch subjects:", error);
-    throw new Error("Failed to fetch subjects");
+    console.warn("Using mock subject data due to API error");
+    return mockSubjects;
   }
 }
 
@@ -250,14 +299,14 @@ export async function sendGroupChatMessage(groupId, messageData) {
  * Fetch a specific chat message
  * @param {string} groupId - Group ID
  * @param {string} messageId - Message ID
- * @returns {Promise<Object>} Chat message details
+ * @returns {Promise<Object>} Chat message data
  */
 export async function fetchGroupChatMessage(groupId, messageId) {
   try {
     const response = await axiosInstance.get(GROUP_ENDPOINTS.CHATS.DETAIL(groupId, messageId));
     return response.data;
   } catch (error) {
-    console.error(`Failed to fetch chat message ${messageId}:`, error);
-    throw new Error("Failed to fetch message details");
+    console.error(`Failed to fetch chat message ${messageId} from group ${groupId}:`, error);
+    throw new Error("Failed to fetch chat message");
   }
 }

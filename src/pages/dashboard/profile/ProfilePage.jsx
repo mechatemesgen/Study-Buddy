@@ -1,4 +1,5 @@
-import { useState } from "react"
+import React from "react"
+import { useState, useEffect } from "react"
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -11,21 +12,56 @@ import { Badge } from "@/components/ui/Badge"
 import { useToast } from "@/components/ui/toast"
 import { useAuth } from "@/hooks/use-auth"
 import { Calendar, Clock, BookOpen, Award, Upload } from "lucide-react"
+import { getProfile, updateProfile } from "@/api/auth"
 
 export default function ProfilePage() {
-  const { user } = useAuth()
+  const { user, setUser } = useAuth()
   const { toast } = useToast()
   const [isLoading, setIsLoading] = useState(false)
+  const [isLoadingProfile, setIsLoadingProfile] = useState(true)
   const [profileData, setProfileData] = useState({
-    name: user?.name || "",
-    email: user?.email || "",
-    bio: user?.bio || "",
-    school: user?.school || "",
-    major: user?.major || "",
-    graduationYear: user?.graduationYear || "",
-    interests: user?.interests || "",
-    avatar: user?.avatar || "/placeholder.svg",
+    name: "",
+    email: "",
+    bio: "",
+    school: "",
+    major: "",
+    graduationYear: "",
+    interests: "",
+    avatar: "/placeholder.svg",
   })
+
+  // Fetch user profile data when the component mounts
+  useEffect(() => {
+    async function fetchProfile() {
+      try {
+        setIsLoadingProfile(true);
+        const profileData = await getProfile();
+        
+        // Map backend data to frontend format
+        setProfileData({
+          name: profileData.full_name || profileData.name || "",
+          email: profileData.email || "",
+          bio: profileData.bio || "",
+          school: profileData.school || "",
+          major: profileData.major || "",
+          graduationYear: profileData.graduation_year || "",
+          interests: profileData.interests || "",
+          avatar: profileData.avatar || "/placeholder.svg",
+        });
+      } catch (error) {
+        console.error("Failed to load profile data:", error);
+        toast({
+          title: "Failed to load profile",
+          description: "There was an error loading your profile data. Please try again.",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoadingProfile(false);
+      }
+    }
+
+    fetchProfile();
+  }, [toast]);
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -37,23 +73,74 @@ export default function ProfilePage() {
     setIsLoading(true)
 
     try {
-      // Simulate API call to update user profile
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      // Format data for backend API
+      const updatedData = {
+        full_name: profileData.name,
+        bio: profileData.bio,
+        school: profileData.school,
+        major: profileData.major,
+        graduation_year: profileData.graduationYear,
+        interests: profileData.interests,
+      };
+
+      const response = await updateProfile(updatedData);
+      
+      // Update local user data
+      const updatedUser = { ...user, ...updatedData, name: updatedData.full_name };
+      setUser(updatedUser);
+      localStorage.setItem("user", JSON.stringify(updatedUser));
 
       toast({
         title: "Profile updated",
         description: "Your profile has been updated successfully.",
-      })
+      });
     } catch (error) {
+      console.error("Profile update error:", error);
       toast({
         title: "Failed to update profile",
-        description: "There was an error updating your profile. Please try again.",
+        description: error.message || "There was an error updating your profile. Please try again.",
         variant: "destructive",
-      })
+      });
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
   }
+
+  const handleAvatarUpload = async (file) => {
+    if (!file) return;
+    
+    const formData = new FormData();
+    formData.append('avatar', file);
+    
+    setIsLoading(true);
+    
+    try {
+      // Update the profile with the avatar
+      const response = await updateProfile(formData);
+      
+      // Update the avatar in state and local storage
+      setProfileData(prev => ({ ...prev, avatar: response.avatar }));
+      
+      // Update the user object
+      const updatedUser = { ...user, avatar: response.avatar };
+      setUser(updatedUser);
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+      
+      toast({
+        title: "Avatar updated",
+        description: "Your profile picture has been updated successfully.",
+      });
+    } catch (error) {
+      console.error("Avatar upload error:", error);
+      toast({
+        title: "Failed to update avatar",
+        description: error.message || "There was an error uploading your avatar. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // Mock data for profile stats
   const stats = [
@@ -88,6 +175,18 @@ export default function ProfilePage() {
     },
   ]
 
+  if (isLoadingProfile) {
+    return (
+      <DashboardLayout>
+        <h1 className="text-3xl font-bold mb-6">My Profile</h1>
+        <div className="animate-pulse space-y-6">
+          <div className="h-64 bg-gray-200 dark:bg-gray-700 rounded-md"></div>
+          <div className="h-96 bg-gray-200 dark:bg-gray-700 rounded-md"></div>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
   return (
     <DashboardLayout>
       <h1 className="text-3xl font-bold mb-6">My Profile</h1>
@@ -104,26 +203,26 @@ export default function ProfilePage() {
             <CardHeader className="pb-2">
               <div className="flex flex-col md:flex-row gap-6 items-start md:items-center">
                 <Avatar className="h-24 w-24">
-                  <AvatarImage src={profileData.avatar} alt={user?.name} />
-                  <AvatarFallback className="text-2xl">{user?.name?.substring(0, 2).toUpperCase()}</AvatarFallback>
+                  <AvatarImage src={profileData.avatar} alt={profileData.name} />
+                  <AvatarFallback className="text-2xl">{profileData.name?.substring(0, 2).toUpperCase() || "?"}</AvatarFallback>
                 </Avatar>
                 <div>
-                  <CardTitle className="text-2xl">{user?.name}</CardTitle>
-                  <CardDescription className="text-lg">{user?.email}</CardDescription>
+                  <CardTitle className="text-2xl">{profileData.name}</CardTitle>
+                  <CardDescription className="text-lg">{profileData.email}</CardDescription>
                   <div className="flex flex-wrap gap-2 mt-2">
-                    {user?.major && (
+                    {profileData.major && (
                       <Badge variant="outline" className="text-xs">
-                        {user.major}
+                        {profileData.major}
                       </Badge>
                     )}
-                    {user?.school && (
+                    {profileData.school && (
                       <Badge variant="outline" className="text-xs">
-                        {user.school}
+                        {profileData.school}
                       </Badge>
                     )}
-                    {user?.graduationYear && (
+                    {profileData.graduationYear && (
                       <Badge variant="outline" className="text-xs">
-                        Class of {user.graduationYear}
+                        Class of {profileData.graduationYear}
                       </Badge>
                     )}
                   </div>
@@ -131,17 +230,17 @@ export default function ProfilePage() {
               </div>
             </CardHeader>
             <CardContent className="space-y-6">
-              {user?.bio && (
+              {profileData.bio && (
                 <div>
                   <h3 className="font-medium mb-2">About</h3>
-                  <p className="text-muted-foreground">{user.bio}</p>
+                  <p className="text-muted-foreground">{profileData.bio}</p>
                 </div>
               )}
 
-              {user?.interests && (
+              {profileData.interests && (
                 <div>
                   <h3 className="font-medium mb-2">Interests</h3>
-                  <p className="text-muted-foreground">{user.interests}</p>
+                  <p className="text-muted-foreground">{profileData.interests}</p>
                 </div>
               )}
 
@@ -186,14 +285,15 @@ export default function ProfilePage() {
                 <div className="flex flex-col md:flex-row gap-6 items-start">
                   <div className="flex flex-col items-center gap-2">
                     <Avatar className="h-24 w-24">
-                      <AvatarImage src={profileData.avatar} alt={user?.name} />
-                      <AvatarFallback className="text-2xl">{user?.name?.substring(0, 2).toUpperCase()}</AvatarFallback>
+                      <AvatarImage src={profileData.avatar} alt={profileData.name} />
+                      <AvatarFallback className="text-2xl">{profileData.name?.substring(0, 2).toUpperCase() || "?"}</AvatarFallback>
                     </Avatar>
                     <Button
                       variant="outline"
                       size="sm"
                       className="mt-2"
                       onClick={() => document.getElementById('avatarInput').click()}
+                      disabled={isLoading}
                     >
                       Change Avatar
                     </Button>
@@ -202,143 +302,98 @@ export default function ProfilePage() {
                       type="file"
                       className="hidden"
                       accept="image/*"
-                      onChange={async (e) => {
+                      onChange={(e) => {
                         const file = e.target.files[0];
-                        if (!file) return;
-
-                        setIsLoading(true);
-                        const formData = new FormData();
-                        formData.append('avatar', file);
-
-                        try {
-                          const response = await fetch('/api/user/avatar', {
-                            method: 'POST',
-                            body: formData,
-                            headers: {
-                              Authorization: `Bearer ${user.token}`,
-                            },
-                          });
-
-                          if (!response.ok) {
-                            throw new Error('Failed to upload avatar');
-                          }
-
-                          const data = await response.json();
-                          if (data.avatarUrl) {
-                            setProfileData((prev) => ({ ...prev, avatar: data.avatarUrl }));
-                          } else {
-                            throw new Error('Avatar URL not returned');
-                          }
-
-                          toast({
-                            title: 'Avatar updated',
-                            description: 'Your avatar has been updated successfully.',
-                          });
-                        } catch (error) {
-                          toast({
-                            title: 'Failed to update avatar',
-                            description: error.message || 'There was an error updating your avatar. Please try again.',
-                            variant: 'destructive',
-                          });
-                        } finally {
-                          setIsLoading(false);
+                        if (file) {
+                          handleAvatarUpload(file);
                         }
                       }}
                     />
                   </div>
                   <div className="flex-1 space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
+                      <div>
                         <Label htmlFor="name">Full Name</Label>
-                        <Input
-                          id="name"
-                          name="name"
+                        <Input 
+                          id="name" 
+                          name="name" 
                           value={profileData.name}
                           onChange={handleChange}
-                          placeholder="Your full name"
+                          disabled={isLoading}
                         />
                       </div>
-                      <div className="space-y-2">
+                      <div>
                         <Label htmlFor="email">Email</Label>
-                        <Input
-                          id="email"
-                          name="email"
-                          type="email"
+                        <Input 
+                          id="email" 
+                          name="email" 
                           value={profileData.email}
-                          onChange={handleChange}
-                          placeholder="Your email address"
-                          disabled
+                          disabled={true} 
+                          readOnly
                         />
                       </div>
                     </div>
-
-                    <div className="space-y-2">
+                    <div>
                       <Label htmlFor="bio">Bio</Label>
-                      <Textarea
-                        id="bio"
+                      <Textarea 
+                        id="bio" 
                         name="bio"
                         value={profileData.bio}
                         onChange={handleChange}
                         placeholder="Tell others about yourself"
-                        rows={3}
+                        disabled={isLoading}
                       />
                     </div>
-
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="school">School/University</Label>
-                        <Input
-                          id="school"
+                      <div>
+                        <Label htmlFor="school">School/Institution</Label>
+                        <Input 
+                          id="school" 
                           name="school"
                           value={profileData.school}
                           onChange={handleChange}
-                          placeholder="Your school or university"
+                          placeholder="Where do you study?"
+                          disabled={isLoading}
                         />
                       </div>
-                      <div className="space-y-2">
+                      <div>
                         <Label htmlFor="major">Major/Field of Study</Label>
-                        <Input
-                          id="major"
+                        <Input 
+                          id="major" 
                           name="major"
                           value={profileData.major}
                           onChange={handleChange}
-                          placeholder="Your major or field of study"
+                          placeholder="What do you study?"
+                          disabled={isLoading}
                         />
                       </div>
-                      <div className="space-y-2">
+                      <div>
                         <Label htmlFor="graduationYear">Graduation Year</Label>
-                        <Input
-                          id="graduationYear"
+                        <Input 
+                          id="graduationYear" 
                           name="graduationYear"
                           value={profileData.graduationYear}
                           onChange={handleChange}
-                          placeholder="Expected graduation year"
+                          placeholder="When will you graduate?"
+                          disabled={isLoading}
                         />
                       </div>
                     </div>
-
-                    <div className="space-y-2">
+                    <div>
                       <Label htmlFor="interests">Interests</Label>
-                      <Textarea
-                        id="interests"
+                      <Textarea 
+                        id="interests" 
                         name="interests"
                         value={profileData.interests}
                         onChange={handleChange}
-                        placeholder="Your academic interests and subjects"
-                        rows={2}
+                        placeholder="What subjects are you interested in?"
+                        disabled={isLoading}
                       />
                     </div>
                   </div>
                 </div>
               </CardContent>
-              <CardFooter className="flex justify-between">
-                <Button
-                  variant="outline"
-                  type="button"
-                  onClick={() => document.querySelector('[data-value="overview"]').click()}
-                >
-                  Cancel
-                </Button>
+              <CardFooter>
                 <Button type="submit" disabled={isLoading}>
                   {isLoading ? "Saving..." : "Save Changes"}
                 </Button>
@@ -347,29 +402,26 @@ export default function ProfilePage() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="achievements" className="space-y-6">
+        <TabsContent value="achievements">
           <Card>
             <CardHeader>
               <CardTitle>Achievements</CardTitle>
-              <CardDescription>Your accomplishments on Study Buddy</CardDescription>
+              <CardDescription>Track your progress and accomplishments</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-6">
-                {achievements.map((achievement, index) => {
-                  const Icon = achievement.icon
-                  return (
-                    <div key={index} className="flex items-start gap-4">
-                      <div className={`p-3 rounded-full ${achievement.color}`}>
-                        <Icon className="h-6 w-6" />
-                      </div>
-                      <div>
-                        <h3 className="font-medium">{achievement.title}</h3>
-                        <p className="text-sm text-muted-foreground">{achievement.description}</p>
-                        <p className="text-xs text-muted-foreground mt-1">Earned {achievement.date}</p>
-                      </div>
+                {achievements.map((achievement, index) => (
+                  <div key={index} className="flex gap-4">
+                    <div className={`${achievement.color} h-12 w-12 rounded-full flex items-center justify-center shrink-0`}>
+                      {React.createElement(achievement.icon, { className: "h-6 w-6" })}
                     </div>
-                  )
-                })}
+                    <div>
+                      <h3 className="font-medium">{achievement.title}</h3>
+                      <p className="text-sm text-muted-foreground mb-1">{achievement.description}</p>
+                      <p className="text-xs text-muted-foreground">Earned {achievement.date}</p>
+                    </div>
+                  </div>
+                ))}
               </div>
             </CardContent>
           </Card>

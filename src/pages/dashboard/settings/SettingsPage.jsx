@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -10,59 +10,214 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Input } from "@/components/ui/input"
 import { useToast } from "@/components/ui/toast"
 import { Moon, Sun, Laptop, Shield, Key, LogOut } from "lucide-react"
-import { useTheme } from "next-themes"; // Correct import for useTheme
+import { useTheme } from "@/hooks/use-theme";
+import { useAuth } from "@/hooks/use-auth";
+import { logout, updateProfile } from "@/api/auth";
 
 export default function SettingsPage() {
-  const { toast } = useToast()
-  const [isLoading, setIsLoading] = useState(false)
+  const { toast } = useToast();
+  const { user } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSettingsLoading, setIsSettingsLoading] = useState(true);
   const [notificationSettings, setNotificationSettings] = useState({
     emailNotifications: true,
     sessionReminders: true,
     groupMessages: true,
     resourceUpdates: true,
     newMembers: false,
-  })
+  });
   const [privacySettings, setPrivacySettings] = useState({
     profileVisibility: "all",
     showEmail: false,
     showActivity: true,
-  })
-  const { theme, setTheme } = useTheme() // Access theme and setter from context
+  });
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
+  const { theme, setTheme } = useTheme();
+
+  // Fetch user settings when component mounts
+  useEffect(() => {
+    async function fetchSettings() {
+      try {
+        setIsSettingsLoading(true);
+        const profileData = await updateProfile();
+        
+        // Set notification settings from user profile if available
+        if (profileData.notification_settings) {
+          setNotificationSettings({
+            emailNotifications: profileData.notification_settings.email_notifications ?? true,
+            sessionReminders: profileData.notification_settings.session_reminders ?? true,
+            groupMessages: profileData.notification_settings.group_messages ?? true,
+            resourceUpdates: profileData.notification_settings.resource_updates ?? true,
+            newMembers: profileData.notification_settings.new_members ?? false,
+          });
+        }
+        
+        // Set privacy settings from user profile if available
+        if (profileData.privacy_settings) {
+          setPrivacySettings({
+            profileVisibility: profileData.privacy_settings.profile_visibility ?? "all",
+            showEmail: profileData.privacy_settings.show_email ?? false,
+            showActivity: profileData.privacy_settings.show_activity ?? true,
+          });
+        }
+      } catch (error) {
+        console.error("Failed to load settings:", error);
+      } finally {
+        setIsSettingsLoading(false);
+      }
+    }
+    
+    fetchSettings();
+  }, []);
 
   const handleNotificationChange = (setting) => {
     setNotificationSettings((prev) => ({
       ...prev,
       [setting]: !prev[setting],
-    }))
-  }
+    }));
+  };
 
   const handlePrivacyChange = (setting, value) => {
     setPrivacySettings((prev) => ({
       ...prev,
       [setting]: value,
-    }))
-  }
+    }));
+  };
+
+  const handlePasswordChange = (e) => {
+    const { name, value } = e.target;
+    setPasswordData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
 
   const handleSaveSettings = async (type) => {
-    setIsLoading(true)
+    setIsLoading(true);
 
     try {
-      // Simulate API call (replace with real API call in production)
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      let data = {};
+      
+      // Prepare the data based on settings type
+      if (type === "notification") {
+        data = {
+          notification_settings: {
+            email_notifications: notificationSettings.emailNotifications,
+            session_reminders: notificationSettings.sessionReminders,
+            group_messages: notificationSettings.groupMessages,
+            resource_updates: notificationSettings.resourceUpdates,
+            new_members: notificationSettings.newMembers,
+          }
+        };
+      } else if (type === "privacy") {
+        data = {
+          privacy_settings: {
+            profile_visibility: privacySettings.profileVisibility,
+            show_email: privacySettings.showEmail,
+            show_activity: privacySettings.showActivity,
+          }
+        };
+      }
+      
+      // Send the updated settings to the API
+      await updateProfile(data);
 
       toast({
         title: "Settings saved",
         description: `Your ${type} settings have been saved successfully.`,
-      })
+      });
     } catch (error) {
+      console.error(`Failed to save ${type} settings:`, error);
       toast({
         title: "Failed to save settings",
-        description: "There was an error saving your settings. Please try again.",
+        description: error.message || "There was an error saving your settings. Please try again.",
         variant: "destructive",
-      })
+      });
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
+  };
+
+  const handleChangePassword = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    
+    try {
+      // Validate passwords
+      if (passwordData.newPassword !== passwordData.confirmPassword) {
+        throw new Error("New passwords don't match");
+      }
+      
+      if (passwordData.newPassword.length < 8) {
+        throw new Error("Password must be at least 8 characters long");
+      }
+      
+      // Send password change request to API
+      await updateProfile({
+        current_password: passwordData.currentPassword,
+        new_password: passwordData.newPassword,
+      });
+      
+      // Reset password fields
+      setPasswordData({
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+      });
+      
+      toast({
+        title: "Password changed",
+        description: "Your password has been changed successfully.",
+      });
+    } catch (error) {
+      console.error("Password change error:", error);
+      toast({
+        title: "Failed to change password",
+        description: error.message || "There was an error changing your password. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    const confirmed = window.confirm(
+      "Are you sure you want to delete your account? This action cannot be undone and all your data will be permanently deleted."
+    );
+    
+    if (confirmed) {
+      setIsLoading(true);
+      try {
+        await updateProfile({ delete_account: true });
+        await logout(true);
+        window.location.href = "/";
+      } catch (error) {
+        console.error("Delete account error:", error);
+        toast({
+          title: "Failed to delete account",
+          description: error.message || "There was an error deleting your account. Please try again.",
+          variant: "destructive",
+        });
+        setIsLoading(false);
+      }
+    }
+  };
+
+  if (isSettingsLoading) {
+    return (
+      <DashboardLayout>
+        <h1 className="text-3xl font-bold mb-6">Settings</h1>
+        <div className="animate-pulse space-y-6">
+          <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded-md w-1/2"></div>
+          <div className="h-64 bg-gray-200 dark:bg-gray-700 rounded-md"></div>
+        </div>
+      </DashboardLayout>
+    );
   }
 
   return (
@@ -96,6 +251,7 @@ export default function SettingsPage() {
                     id="emailNotifications"
                     checked={notificationSettings.emailNotifications}
                     onCheckedChange={() => handleNotificationChange("emailNotifications")}
+                    disabled={isLoading}
                   />
                 </div>
 
@@ -110,6 +266,7 @@ export default function SettingsPage() {
                     id="sessionReminders"
                     checked={notificationSettings.sessionReminders}
                     onCheckedChange={() => handleNotificationChange("sessionReminders")}
+                    disabled={isLoading}
                   />
                 </div>
 
@@ -124,6 +281,7 @@ export default function SettingsPage() {
                     id="groupMessages"
                     checked={notificationSettings.groupMessages}
                     onCheckedChange={() => handleNotificationChange("groupMessages")}
+                    disabled={isLoading}
                   />
                 </div>
 
@@ -138,6 +296,7 @@ export default function SettingsPage() {
                     id="resourceUpdates"
                     checked={notificationSettings.resourceUpdates}
                     onCheckedChange={() => handleNotificationChange("resourceUpdates")}
+                    disabled={isLoading}
                   />
                 </div>
 
@@ -152,6 +311,7 @@ export default function SettingsPage() {
                     id="newMembers"
                     checked={notificationSettings.newMembers}
                     onCheckedChange={() => handleNotificationChange("newMembers")}
+                    disabled={isLoading}
                   />
                 </div>
               </div>
@@ -229,6 +389,7 @@ export default function SettingsPage() {
                   <Select
                     value={privacySettings.profileVisibility}
                     onValueChange={(value) => handlePrivacyChange("profileVisibility", value)}
+                    disabled={isLoading}
                   >
                     <SelectTrigger id="profileVisibility">
                       <SelectValue placeholder="Select visibility" />
@@ -252,6 +413,7 @@ export default function SettingsPage() {
                     id="showEmail"
                     checked={privacySettings.showEmail}
                     onCheckedChange={(checked) => handlePrivacyChange("showEmail", checked)}
+                    disabled={isLoading}
                   />
                 </div>
 
@@ -266,6 +428,7 @@ export default function SettingsPage() {
                     id="showActivity"
                     checked={privacySettings.showActivity}
                     onCheckedChange={(checked) => handlePrivacyChange("showActivity", checked)}
+                    disabled={isLoading}
                   />
                 </div>
               </div>
@@ -290,15 +453,42 @@ export default function SettingsPage() {
                   <Label htmlFor="currentPassword" className="font-medium">
                     Change Password
                   </Label>
-                  <div className="space-y-2">
-                    <Input id="currentPassword" type="password" placeholder="Current password" />
-                    <Input id="newPassword" type="password" placeholder="New password" />
-                    <Input id="confirmPassword" type="password" placeholder="Confirm new password" />
-                  </div>
-                  <Button className="mt-2" variant="outline" size="sm">
-                    <Key className="mr-2 h-4 w-4" />
-                    Change Password
-                  </Button>
+                  <form onSubmit={handleChangePassword} className="space-y-2">
+                    <Input 
+                      id="currentPassword" 
+                      name="currentPassword"
+                      type="password" 
+                      placeholder="Current password" 
+                      value={passwordData.currentPassword}
+                      onChange={handlePasswordChange}
+                      disabled={isLoading}
+                      required
+                    />
+                    <Input 
+                      id="newPassword" 
+                      name="newPassword"
+                      type="password" 
+                      placeholder="New password" 
+                      value={passwordData.newPassword}
+                      onChange={handlePasswordChange}
+                      disabled={isLoading}
+                      required
+                    />
+                    <Input 
+                      id="confirmPassword" 
+                      name="confirmPassword"
+                      type="password" 
+                      placeholder="Confirm new password" 
+                      value={passwordData.confirmPassword}
+                      onChange={handlePasswordChange}
+                      disabled={isLoading}
+                      required
+                    />
+                    <Button className="mt-2" type="submit" variant="outline" size="sm" disabled={isLoading}>
+                      <Key className="mr-2 h-4 w-4" />
+                      {isLoading ? "Changing..." : "Change Password"}
+                    </Button>
+                  </form>
                 </div>
 
                 <div className="pt-4 border-t">
@@ -308,10 +498,10 @@ export default function SettingsPage() {
                   </h3>
                   <p className="text-sm text-muted-foreground mb-4">Manage your account security settings</p>
                   <div className="space-y-2">
-                    <Button variant="outline" size="sm">
+                    <Button variant="outline" size="sm" disabled>
                       Enable Two-Factor Authentication
                     </Button>
-                    <p className="text-xs text-muted-foreground">Add an extra layer of security to your account</p>
+                    <p className="text-xs text-muted-foreground">Add an extra layer of security to your account (Coming soon)</p>
                   </div>
                 </div>
 
@@ -322,7 +512,12 @@ export default function SettingsPage() {
                   </h3>
                   <p className="text-sm text-muted-foreground mb-4">Permanent actions that cannot be undone</p>
                   <div className="space-y-2">
-                    <Button variant="destructive" size="sm">
+                    <Button 
+                      variant="destructive" 
+                      size="sm" 
+                      onClick={handleDeleteAccount}
+                      disabled={isLoading}
+                    >
                       Delete Account
                     </Button>
                     <p className="text-xs text-muted-foreground">

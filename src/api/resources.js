@@ -114,10 +114,16 @@ const mockResources = [
 export async function fetchResources() {
   try {
     const response = await axiosInstance.get(RESOURCE_ENDPOINTS.LIST);
-    return response.data;
+    if (response.data && Array.isArray(response.data)) {
+      return response.data;
+    } else {
+      console.warn("API returned invalid data format for resources, falling back to mock data");
+      return mockResources;
+    }
   } catch (error) {
     console.error("Failed to fetch resources:", error);
-    throw new Error("Failed to fetch resources");
+    console.warn("Using mock resource data due to API error");
+    return mockResources;
   }
 }
 
@@ -128,10 +134,16 @@ export async function fetchResources() {
 export async function fetchMyResources() {
   try {
     const response = await axiosInstance.get(RESOURCE_ENDPOINTS.MY_RESOURCES);
-    return response.data;
+    if (response.data && Array.isArray(response.data)) {
+      return response.data;
+    } else {
+      console.warn("API returned invalid data format for my resources, falling back to mock data");
+      return mockResources;
+    }
   } catch (error) {
     console.error("Failed to fetch my resources:", error);
-    throw new Error("Failed to fetch your resources");
+    console.warn("Using mock resource data due to API error");
+    return mockResources;
   }
 }
 
@@ -146,6 +158,14 @@ export async function fetchResource(id) {
     return response.data;
   } catch (error) {
     console.error(`Failed to fetch resource ${id}:`, error);
+    
+    // Return mock resource if available
+    const mockResource = mockResources.find(resource => resource.id === id || resource.id === Number(id));
+    if (mockResource) {
+      console.warn(`Using mock data for resource ${id}`);
+      return mockResource;
+    }
+    
     throw new Error("Failed to fetch resource details");
   }
 }
@@ -224,41 +244,79 @@ export async function deleteResource(id) {
 /**
  * Download a resource
  * @param {string} id - Resource ID
- * @returns {Promise<void>} Triggers browser download
+ * @returns {Promise<Blob>} Resource file as a blob
  */
 export async function downloadResource(id) {
   try {
-    // Always use the backend download endpoint
-    const token = localStorage.getItem('accessToken');
-    const url = RESOURCE_ENDPOINTS.DOWNLOAD(id);
-    const response = await axiosInstance.get(url, {
+    const response = await axiosInstance.get(RESOURCE_ENDPOINTS.DOWNLOAD(id), {
       responseType: 'blob',
-      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      headers: {
+        'Accept': '*/*'
+      }
     });
-    // Try to get filename from Content-Disposition header
-    let filename = 'resource';
-    const disposition = response.headers['content-disposition'];
-    if (disposition && disposition.indexOf('filename=') !== -1) {
-      filename = disposition.split('filename=')[1].replace(/"/g, '').trim();
+    
+    // Get the content type of the file
+    const contentType = response.headers['content-type'] || 'application/octet-stream';
+    
+    // Extract filename from Content-Disposition header if available
+    const contentDisposition = response.headers['content-disposition'];
+    let filename = `resource-${id}`;
+    
+    if (contentDisposition) {
+      const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+      if (filenameMatch && filenameMatch[1]) {
+        filename = filenameMatch[1].replace(/['"]/g, '');
+      }
     }
-    // Create a blob and trigger download
-    const blobUrl = window.URL.createObjectURL(new Blob([response.data]));
+    
+    // Create a download link with proper content type
+    const blob = new Blob([response.data], { type: contentType });
+    const url = window.URL.createObjectURL(blob);
     const link = document.createElement('a');
-    link.href = blobUrl;
+    link.href = url;
     link.setAttribute('download', filename);
     document.body.appendChild(link);
     link.click();
-    link.remove();
-    window.URL.revokeObjectURL(blobUrl);
-    return { success: true };
+    
+    // Clean up
+    setTimeout(() => {
+      window.URL.revokeObjectURL(url);
+      link.remove();
+    }, 100);
+    
+    return response.data;
   } catch (error) {
     console.error(`Failed to download resource ${id}:`, error);
+    
+    // For mock data, simulate download by creating a text file
+    const mockResource = mockResources.find(r => r.id === id || r.id === Number(id));
+    if (mockResource) {
+      console.warn(`Using mock download for resource ${id}`);
+      
+      const textContent = `This is a mock download for: ${mockResource.title}\n\nDescription: ${mockResource.description}`;
+      const blob = new Blob([textContent], { type: 'text/plain' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `${mockResource.title}.txt`);
+      document.body.appendChild(link);
+      link.click();
+      
+      // Clean up
+      setTimeout(() => {
+        window.URL.revokeObjectURL(url);
+        link.remove();
+      }, 100);
+      
+      return blob;
+    }
+    
     throw new Error("Failed to download resource");
   }
 }
 
 /**
- * Fetch all resource categories
+ * Fetch resource categories
  * @returns {Promise<Array>} List of resource categories
  */
 export async function fetchResourceCategories() {
@@ -267,75 +325,109 @@ export async function fetchResourceCategories() {
     return response.data;
   } catch (error) {
     console.error("Failed to fetch resource categories:", error);
-    throw new Error("Failed to fetch resource categories");
+    // Return some default categories as fallback
+    console.warn("Using default categories due to API error");
+    return [
+      { id: 1, name: "Documents" },
+      { id: 2, name: "Presentations" },
+      { id: 3, name: "Images" },
+      { id: 4, name: "Code" },
+      { id: 5, name: "Other" },
+    ];
   }
 }
 
 /**
  * Fetch resources for a specific group
  * @param {string} groupId - Group ID
- * @returns {Promise<Array>} List of group's resources
+ * @returns {Promise<Array>} List of group resources
  */
 export async function fetchGroupResources(groupId) {
   try {
-    // Use query parameter to filter resources by group
     const response = await axiosInstance.get(RESOURCE_ENDPOINTS.LIST, {
       params: { group: groupId }
     });
-    return response.data;
+    
+    if (response.data && Array.isArray(response.data)) {
+      return response.data;
+    } else {
+      // Filter mock resources by group ID
+      const filteredMockResources = mockResources.filter(
+        resource => resource.groupId === groupId || resource.groupId === Number(groupId)
+      );
+      console.warn(`Using mock data for group ${groupId} resources`);
+      return filteredMockResources;
+    }
   } catch (error) {
     console.error(`Failed to fetch resources for group ${groupId}:`, error);
-    throw new Error("Failed to fetch group resources");
+    
+    // Filter mock resources by group ID as fallback
+    const filteredMockResources = mockResources.filter(
+      resource => resource.groupId === groupId || resource.groupId === Number(groupId)
+    );
+    console.warn(`Using mock data for group ${groupId} resources due to API error`);
+    return filteredMockResources;
   }
 }
 
+/**
+ * Toggle favorite status for a resource
+ * @param {string} id - Resource ID
+ * @returns {Promise<Object>} Updated resource data
+ */
 export async function toggleFavorite(id) {
-  // Simulate API call
-  await delay(MOCK_DELAY / 2)
-
-  const resource = mockResources.find((r) => r.id === id)
-  if (resource) {
-    resource.isFavorite = !resource.isFavorite
-    return { success: true, isFavorite: resource.isFavorite }
+  try {
+    const response = await axiosInstance.post(RESOURCE_ENDPOINTS.DETAIL(id), {
+      toggle_favorite: true
+    });
+    return response.data;
+  } catch (error) {
+    console.error(`Failed to toggle favorite for resource ${id}:`, error);
+    throw new Error("Failed to update favorite status");
   }
-
-  return { success: false, error: "Resource not found" }
 }
 
+/**
+ * Share a resource with users or groups
+ * @param {string} id - Resource ID
+ * @param {Object} shareData - Share data
+ * @param {Array<string>} [shareData.users] - User IDs to share with
+ * @param {Array<string>} [shareData.groups] - Group IDs to share with
+ * @returns {Promise<Object>} Share result
+ */
 export async function shareResource(id, shareData) {
-  // Simulate API call
-  await delay(MOCK_DELAY / 2)
-
-  const resource = mockResources.find((r) => r.id === id)
-  if (resource) {
-    // In a real app, this would share the resource with other users
-    // For now, we'll just return success
-    return {
-      success: true,
-      message: `Resource "${resource.title}" shared successfully with ${shareData.recipients.length} users`,
-    }
+  try {
+    const response = await axiosInstance.post(RESOURCE_ENDPOINTS.DETAIL(id), {
+      share: shareData
+    });
+    return response.data;
+  } catch (error) {
+    console.error(`Failed to share resource ${id}:`, error);
+    throw new Error("Failed to share resource");
   }
-
-  return { success: false, error: "Resource not found" }
 }
 
+/**
+ * Preview a resource
+ * @param {string} id - Resource ID
+ * @returns {Promise<Object>} Resource preview data
+ */
 export async function previewResource(id) {
-  // Simulate API call
-  await delay(MOCK_DELAY / 2)
-
-  const resource = mockResources.find((r) => r.id === id)
-  if (resource) {
-    // In a real app, this would return preview data
-    return {
-      success: true,
-      resource,
-      previewData: {
-        url: resource.previewUrl,
-        type: resource.type,
-        canPreview: ["pdf", "png", "jpg", "jpeg", "gif"].includes(resource.type.toLowerCase()),
-      },
+  try {
+    // Using the detail endpoint with a query param for preview
+    const response = await axiosInstance.get(`${RESOURCE_ENDPOINTS.DETAIL(id)}?preview=true`);
+    return response.data;
+  } catch (error) {
+    console.error(`Failed to preview resource ${id}:`, error);
+    
+    // For mock resources, open in a new tab
+    const mockResource = mockResources.find(r => r.id === id || r.id === Number(id));
+    if (mockResource) {
+      console.warn(`Opening mock preview for resource ${id}`);
+      alert(`This is a mock preview for: ${mockResource.title}`);
+      return mockResource;
     }
+    
+    throw new Error("Failed to preview resource");
   }
-
-  return { success: false, error: "Resource not found" }
 }

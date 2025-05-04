@@ -6,11 +6,12 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { FileText, FileImage, FileCode, File, Upload, Download, MoreHorizontal } from "lucide-react"
 import { ResourceUploader } from "@/components/ResourceUploader"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { downloadResource } from "@/api/resources"
+import { downloadResource, previewResource } from "@/api/resources"
 import { useToast } from "@/components/ui/toast"
 
 export function ResourcesSection({ resources = [], isLoading }) {
   const [isUploaderOpen, setIsUploaderOpen] = useState(false)
+  const { toast } = useToast();
 
   if (isLoading) {
     return (
@@ -87,46 +88,85 @@ export function ResourcesSection({ resources = [], isLoading }) {
 function ResourceCard({ resource }) {
   const { toast } = useToast();
 
-  const getFileIcon = (type) => {
-    switch (type) {
-      case "pdf":
-        return <FileText className="h-10 w-10 text-red-500" />
-      case "doc":
-      case "docx":
-        return <FileText className="h-10 w-10 text-blue-500" />
-      case "ppt":
-      case "pptx":
-        return <FileText className="h-10 w-10 text-orange-500" />
-      case "jpg":
-      case "png":
-      case "gif":
-        return <FileImage className="h-10 w-10 text-green-500" />
-      case "js":
-      case "html":
-      case "css":
-        return <FileCode className="h-10 w-10 text-yellow-500" />
-      default:
-        return <File className="h-10 w-10 text-gray-500" />
+  // Helper function to determine real file type from file extension or content type
+  const getFileType = (resource) => {
+    if (!resource) return '';
+    
+    // First check if we have a file_type from the backend
+    if (resource.file_type) {
+      return resource.file_type.toLowerCase();
     }
-  }
+    
+    // Then check if there's a type property
+    if (resource.type) {
+      return resource.type.toLowerCase();
+    }
+    
+    // Try to extract from file name if available
+    if (resource.file_name) {
+      const parts = resource.file_name.split('.');
+      if (parts.length > 1) {
+        return parts[parts.length - 1].toLowerCase();
+      }
+    }
+    
+    // Try to extract from title if available
+    if (resource.title) {
+      const parts = resource.title.split('.');
+      if (parts.length > 1) {
+        return parts[parts.length - 1].toLowerCase();
+      }
+    }
+    
+    return '';
+  };
+
+  const getFileIcon = (resource) => {
+    const type = getFileType(resource);
+    
+    // Document types
+    if (['pdf', 'doc', 'docx', 'txt', 'rtf'].includes(type)) {
+      return <FileText className={`h-10 w-10 ${type === 'pdf' ? 'text-red-500' : 'text-blue-500'}`} />;
+    }
+    
+    // Presentation types
+    if (['ppt', 'pptx', 'key'].includes(type)) {
+      return <FileText className="h-10 w-10 text-orange-500" />;
+    }
+    
+    // Image types
+    if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp'].includes(type)) {
+      return <FileImage className="h-10 w-10 text-green-500" />;
+    }
+    
+    // Code types
+    if (['js', 'jsx', 'ts', 'tsx', 'html', 'css', 'py', 'java', 'c', 'cpp', 'cs', 'rb', 'php', 'go'].includes(type)) {
+      return <FileCode className="h-10 w-10 text-yellow-500" />;
+    }
+    
+    // Default for unknown types
+    return <File className="h-10 w-10 text-gray-500" />;
+  };
 
   const handleDownload = async () => {
     try {
-      await downloadResource(resource.id);
-      if (resource.downloadUrl && resource.downloadUrl !== "#") {
-        // Create a temporary link to trigger download
-        const link = document.createElement("a");
-        link.href = resource.downloadUrl;
-        link.download = resource.title || "resource";
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      }
       toast({
-        title: "Download started",
-        description: "Your file is being downloaded.",
+        title: "Downloading...",
+        description: "Your download is starting.",
+      });
+      
+      // Get the file name from the resource if available
+      const fileName = resource.file_name || `${resource.title}.${getFileType(resource)}` || `resource-${resource.id}`;
+      
+      console.log(`Starting download for resource ${resource.id}: ${fileName}`);
+      await downloadResource(resource.id);
+      
+      toast({
+        title: "Download complete",
+        description: `${fileName} has been downloaded.`,
       });
     } catch (error) {
+      console.error("Download error:", error);
       toast({
         title: "Download failed",
         description: error.message || "There was an error downloading the file. Please try again.",
@@ -135,18 +175,30 @@ function ResourceCard({ resource }) {
     }
   };
 
+  const handlePreview = async () => {
+    try {
+      await previewResource(resource.id);
+    } catch (error) {
+      toast({
+        title: "Preview failed",
+        description: error.message || "There was an error previewing the file. Please try downloading instead.",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <div className="p-3 rounded-lg border hover:bg-muted/50 transition-colors">
       <div className="flex items-start gap-3">
-        {getFileIcon(resource.type)}
+        {getFileIcon(resource)}
         <div className="flex-1 min-w-0">
           <Link to={`/dashboard/resources/${resource.id}`} className="font-medium hover:underline truncate block">
             {resource.title}
           </Link>
           <div className="flex items-center text-xs text-muted-foreground mt-1">
-            <span className="truncate">{resource.uploadedBy}</span>
+            <span className="truncate">{resource.uploadedBy || resource.owner || "Unknown"}</span>
             <span className="mx-1">•</span>
-            <span>{resource.uploadedAt}</span>
+            <span>{resource.uploadedAt || "Recently"}</span>
           </div>
         </div>
         <div className="flex items-center">
@@ -162,11 +214,11 @@ function ResourceCard({ resource }) {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem>Preview</DropdownMenuItem>
-              <DropdownMenuItem>Share</DropdownMenuItem>
+              <DropdownMenuItem onClick={handlePreview}>Preview</DropdownMenuItem>
+              <DropdownMenuItem onClick={handleDownload}>Download</DropdownMenuItem>
               <DropdownMenuItem>Add to Favorites</DropdownMenuItem>
               <DropdownMenuItem disabled>
-                {(resource.type || "").toUpperCase()}
+                {getFileType(resource).toUpperCase() || "FILE"}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

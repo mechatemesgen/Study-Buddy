@@ -27,7 +27,7 @@ export function CreateGroupDialog({ open, onOpenChange }) {
   const { toast } = useToast();
   const [formData, setFormData] = useState({
     name: "",
-    subject_id: "",
+    subject: "",
     description: "",
     privacy: "public",
   });
@@ -43,11 +43,14 @@ export function CreateGroupDialog({ open, onOpenChange }) {
       setIsSubjectsLoading(true);
       fetchSubjects()
         .then((data) => setSubjects(data))
-        .catch(() => setSubjects([]))
+        .catch((error) => {
+          console.error("Failed to fetch subjects:", error);
+          setSubjects([]);
+        })
         .finally(() => setIsSubjectsLoading(false));
       setSubjectMode("select");
       setNewSubject("");
-      setFormData((prev) => ({ ...prev, subject_id: "" }));
+      setFormData((prev) => ({ ...prev, subject: "" }));
     }
   }, [open]);
 
@@ -57,13 +60,13 @@ export function CreateGroupDialog({ open, onOpenChange }) {
   };
 
   const handleSelectChange = (name, value) => {
-    if (name === "subject_id") {
+    if (name === "subject") {
       if (value === "__new__") {
         setSubjectMode("new");
-        setFormData((prev) => ({ ...prev, subject_id: "" }));
+        setFormData((prev) => ({ ...prev, subject: "" }));
       } else {
         setSubjectMode("select");
-        setFormData((prev) => ({ ...prev, subject_id: value }));
+        setFormData((prev) => ({ ...prev, subject: value }));
       }
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }));
@@ -86,7 +89,7 @@ export function CreateGroupDialog({ open, onOpenChange }) {
       setIsLoading(false);
       return;
     }
-    if (subjectMode === "select" && !formData.subject_id) {
+    if (subjectMode === "select" && !formData.subject) {
       setErrorMsg("Please select a subject.");
       setIsLoading(false);
       return;
@@ -98,24 +101,36 @@ export function CreateGroupDialog({ open, onOpenChange }) {
     }
 
     try {
-      let payload = {
+      // Prepare the payload
+      const payload = {
         name: formData.name,
         description: formData.description,
-        privacy: formData.privacy,
+        privacy: formData.privacy
       };
+      
+      // Handle subject based on mode
       if (subjectMode === "new" && newSubject.trim()) {
         payload.subject_name = newSubject.trim();
-      } else if (formData.subject_id) {
-        payload.subject_id = Number(formData.subject_id);
+      } else if (subjectMode === "select" && formData.subject) {
+        if (formData.subject !== "__new__") {
+          payload.subject_id = Number(formData.subject);
+        }
       }
+      
+      console.log("Creating group with payload:", payload);
       const newGroup = await createGroup(payload);
+      
       toast({
         title: "Group created",
         description: `${formData.name} has been created successfully.`,
       });
+      
       onOpenChange(false);
-      navigate(`/dashboard/groups/${newGroup.id}`); // React Router navigation
+      
+      // Navigate to the new group page
+      navigate(`/dashboard/groups/${newGroup.id}`);
     } catch (error) {
+      console.error("Group creation error:", error);
       setErrorMsg(error.message || "There was an error creating your study group. Please try again.");
       toast({
         title: "Failed to create group",
@@ -151,15 +166,15 @@ export function CreateGroupDialog({ open, onOpenChange }) {
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="subject_id">Subject</Label>
+              <Label htmlFor="subject">Subject</Label>
               {subjectMode === "select" && (
                 <Select
-                  value={formData.subject_id}
-                  onValueChange={(value) => handleSelectChange("subject_id", value)}
+                  value={formData.subject}
+                  onValueChange={(value) => handleSelectChange("subject", value)}
                   disabled={isSubjectsLoading}
                   required
                 >
-                  <SelectTrigger id="subject_id">
+                  <SelectTrigger id="subject">
                     <SelectValue placeholder={isSubjectsLoading ? "Loading..." : "Select a subject"} />
                   </SelectTrigger>
                   <SelectContent>

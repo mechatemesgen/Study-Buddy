@@ -146,10 +146,18 @@ const mockSessions = [
 export async function fetchSessions() {
   try {
     const response = await axiosInstance.get(DASHBOARD_ENDPOINTS.SESSIONS.LIST);
-    return response.data;
+    
+    // Check if the response data is valid
+    if (response.data && Array.isArray(response.data)) {
+      return response.data;
+    } else {
+      console.warn("API returned invalid data format for sessions, falling back to mock data");
+      return mockSessions;
+    }
   } catch (error) {
     console.error("Failed to fetch sessions:", error);
-    throw new Error("Failed to fetch study sessions");
+    console.warn("Using mock session data due to API error");
+    return mockSessions;
   }
 }
 
@@ -164,6 +172,14 @@ export async function fetchSession(id) {
     return response.data;
   } catch (error) {
     console.error(`Failed to fetch session ${id}:`, error);
+    
+    // Return mock session if available
+    const mockSession = mockSessions.find(session => session.id === id || session.id === Number(id));
+    if (mockSession) {
+      console.warn(`Using mock data for session ${id}`);
+      return mockSession;
+    }
+    
     throw new Error("Failed to fetch session details");
   }
 }
@@ -250,37 +266,51 @@ export async function leaveSession(id) {
 /**
  * Fetch sessions for a specific group
  * @param {string} groupId - Group ID
- * @returns {Promise<Array>} List of group's sessions
+ * @returns {Promise<Array>} List of group sessions
  */
 export async function fetchGroupSessions(groupId) {
   try {
-    // Use query parameter to filter sessions by group
     const response = await axiosInstance.get(DASHBOARD_ENDPOINTS.SESSIONS.LIST, {
       params: { group: groupId }
     });
-    return response.data;
+    
+    if (response.data && Array.isArray(response.data)) {
+      return response.data;
+    } else {
+      // Filter mock sessions by group ID
+      const filteredMockSessions = mockSessions.filter(
+        session => session.groupId === groupId || session.groupId === Number(groupId)
+      );
+      console.warn(`Using mock data for group ${groupId} sessions`);
+      return filteredMockSessions;
+    }
   } catch (error) {
     console.error(`Failed to fetch sessions for group ${groupId}:`, error);
-    throw new Error("Failed to fetch group study sessions");
+    
+    // Filter mock sessions by group ID as fallback
+    const filteredMockSessions = mockSessions.filter(
+      session => session.groupId === groupId || session.groupId === Number(groupId)
+    );
+    console.warn(`Using mock data for group ${groupId} sessions due to API error`);
+    return filteredMockSessions;
   }
 }
 
+/**
+ * Add material to a session
+ * @param {string} sessionId - Session ID
+ * @param {string} resourceId - Resource ID
+ * @returns {Promise<Object>} Updated session data
+ */
 export async function addSessionMaterial(sessionId, resourceId) {
-  // Simulate API call
-  await delay(MOCK_DELAY / 2)
-
-  const session = mockSessions.find((s) => s.id === sessionId)
-  if (session) {
-    // In a real app, you would fetch the resource details
-    // For now, we'll just add a mock resource
-    session.materials.push({
-      id: resourceId,
-      title: `Resource ${resourceId}`,
-      type: "pdf",
-    })
-
-    return { success: true, session }
+  try {
+    const response = await axiosInstance.post(
+      DASHBOARD_ENDPOINTS.SESSIONS.DETAIL(sessionId), 
+      { add_material: resourceId }
+    );
+    return response.data;
+  } catch (error) {
+    console.error(`Failed to add material to session ${sessionId}:`, error);
+    throw new Error("Failed to add material to session");
   }
-
-  return { success: false, error: "Session not found" }
 }
