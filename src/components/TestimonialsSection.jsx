@@ -3,6 +3,7 @@ import { Star, ChevronLeft, ChevronRight } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
 import { Card, CardContent } from "./ui/card"
 import { Button } from "./ui/button"
+import { motion } from "framer-motion"
 
 export default function TestimonialsSection() {
   const testimonials = [
@@ -25,7 +26,8 @@ export default function TestimonialsSection() {
     {
       name: "Emily Rodriguez",
       role: "Graduate Student",
-      content: "The progress tracking keeps me motivated. Best study tool I've used!",
+      content:
+        "The progress tracking keeps me motivated. Best study tool I've used!",
       rating: 5,
       image: "/placeholder-user.jpg",
     },
@@ -51,7 +53,6 @@ export default function TestimonialsSection() {
   const [scrollPos, setScrollPos] = useState(0)
   const [canScrollNext, setCanScrollNext] = useState(false)
 
-  // Update scrollPos on scroll and track whether we can scroll further right
   useEffect(() => {
     const container = containerRef.current
     if (!container) return
@@ -61,17 +62,18 @@ export default function TestimonialsSection() {
       setScrollPos(scrollLeft)
       setCanScrollNext(scrollLeft + clientWidth < scrollWidth - 1)
     }
+
     container.addEventListener("scroll", onScroll)
-    // initialize
     onScroll()
+
     return () => container.removeEventListener("scroll", onScroll)
   }, [])
 
   const scrollByPage = (direction) => {
     const container = containerRef.current
     if (!container) return
-    const { scrollLeft, clientWidth, scrollWidth } = container
 
+    const { scrollLeft, clientWidth, scrollWidth } = container
     const delta = direction === "left" ? -clientWidth : clientWidth
     const newPos = Math.min(
       Math.max(scrollLeft + delta, 0),
@@ -93,8 +95,7 @@ export default function TestimonialsSection() {
               What Our Users Say
             </h2>
             <p className="max-w-[900px] text-muted-foreground md:text-xl">
-              Discover how Study Buddy has helped students improve their
-              academic performance
+              Discover how Study Buddy has helped students improve their academic performance
             </p>
           </div>
         </div>
@@ -122,9 +123,13 @@ export default function TestimonialsSection() {
             style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
           >
             {testimonials.map((t, i) => (
-              <div
+              <motion.div
                 key={i}
-                className="snap-center flex-shrink-0 w-full md:w-1/2 lg:w-1/3 px-2"
+                className="snap-center flex-shrink-0 w-[90%] sm:w-2/3 md:w-1/2 lg:w-1/3 px-2"
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.2 }}
+                transition={{ duration: 0.4, delay: i * 0.1 }}
               >
                 <Card className="h-full border-border/40 transition-shadow duration-200 hover:shadow-md">
                   <CardContent className="p-6">
@@ -132,14 +137,16 @@ export default function TestimonialsSection() {
                       <Avatar>
                         <AvatarImage src={t.image} alt={t.name} />
                         <AvatarFallback>
-                          {t.name.substring(0, 2).toUpperCase()}
+                          {t.name
+                            .split(" ")
+                            .map((n) => n[0])
+                            .join("")
+                            .toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
                       <div>
                         <h3 className="font-medium">{t.name}</h3>
-                        <p className="text-sm text-muted-foreground">
-                          {t.role}
-                        </p>
+                        <p className="text-sm text-muted-foreground">{t.role}</p>
                       </div>
                     </div>
                     <div className="flex mb-4">
@@ -157,7 +164,7 @@ export default function TestimonialsSection() {
                     <p className="text-muted-foreground">{t.content}</p>
                   </CardContent>
                 </Card>
-              </div>
+              </motion.div>
             ))}
           </div>
 

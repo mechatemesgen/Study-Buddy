@@ -1,14 +1,14 @@
+import React, { useEffect } from 'react';
+import AOS from 'aos';
+import 'aos/dist/aos.css';
 
-import React from 'react'
-import { ArrowRight, Users, Calendar, FileText, Video } from 'lucide-react'
-import { Card, CardContent } from './ui/card' 
+import { ArrowRight, Users, Calendar, FileText, Video } from 'lucide-react';
+import { Card } from './ui/card';
 
-import JoinStudyGroups from '../../src/assets/JoinStudyGroups.jpg'
-import ScheduleStudySessions from '../../src/assets/ScheduleStudySessions.jpg'
-import ShareStudyResources from '../../src/assets/ShareStudyResources.jpg'
-import CollaborateinRealTime from '../../src/assets/CollaborateinRealTime.jpg'
-
-
+import JoinStudyGroups from '../../src/assets/JoinStudyGroups.jpg';
+import ScheduleStudySessions from '../../src/assets/ScheduleStudySessions.jpg';
+import ShareStudyResources from '../../src/assets/ShareStudyResources.jpg';
+import CollaborateinRealTime from '../../src/assets/CollaborateinRealTime.jpg';
 
 const steps = [
   {
@@ -43,14 +43,21 @@ const steps = [
     color: 'bg-amber-500',
     image: CollaborateinRealTime,
   },
-]
+];
 
 export default function HowItWorksSection() {
+  useEffect(() => {
+    AOS.init({
+      duration: 1000,
+      once: true,
+    });
+  }, []);
+
   return (
     <section id="how-it-works" className="w-full py-20 md:py-28 lg:py-20 bg-muted/30">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="flex flex-col items-center text-center space-y-4">
+        <div className="flex flex-col items-center text-center space-y-4" data-aos="fade-up">
           <span className="inline-block rounded-full bg-primary/10 px-4 py-1 text-xs font-semibold text-primary uppercase tracking-wide">
             How It Works
           </span>
@@ -65,10 +72,15 @@ export default function HowItWorksSection() {
         {/* Steps Grid */}
         <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {steps.map((step, idx) => {
-            const Icon = step.icon
-            const iconColor = step.color.replace('bg-', 'text-')
+            const Icon = step.icon;
+            const iconColor = step.color.replace('bg-', 'text-');
             return (
-              <div key={idx} className="relative group flex flex-col">
+              <div
+                key={idx}
+                className="relative group flex flex-col"
+                data-aos="zoom-in"
+                data-aos-delay={idx * 100}
+              >
                 {idx < steps.length - 1 && (
                   <div
                     className="hidden xl:block absolute top-1/2 left-full h-px bg-border"
@@ -79,41 +91,27 @@ export default function HowItWorksSection() {
                 )}
 
                 <Card className="flex flex-col h-full transform transition-transform duration-300 group-hover:-translate-y-2 group-hover:shadow-2xl overflow-hidden">
-                  {/* Rounded color bar */}
                   <div className={`${step.color} h-2 w-1/2 rounded-br-lg`} />
-
-                  {/* Fixed-height image */}
                   <div className="relative overflow-hidden h-40 md:h-48">
                     <img
                       src={step.image}
                       alt={step.title}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      className="w-full h-full object-cover"
                     />
-                    <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <div className="rounded-full bg-gray-200/20 p-3 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
-                        <Icon className={`h-6 w-6 ${iconColor}`} />
-                      </div>
-                    </div>
-                    <div className="absolute top-2 right-2 flex items-center justify-center h-6 w-6 rounded-full bg-primary text-xs text-primary-foreground">
-                      {idx + 1}
-                    </div>
                   </div>
-
-                  {/* Content stretches to fill */}
-                  <CardContent className="flex-1 flex flex-col p-5 md:p-6">
-                    <h3 className="text-lg md:text-xl font-semibold mb-2">
-                      {step.title}
-                    </h3>
-                    <p className="text-sm md:text-base text-muted-foreground flex-1">
-                      {step.description}
-                    </p>
-                  </CardContent>
+                  <div className="p-4 space-y-2">
+                    <div className={`text-2xl ${iconColor}`}>
+                      <Icon />
+                    </div>
+                    <h3 className="text-lg font-semibold">{step.title}</h3>
+                    <p className="text-muted-foreground text-sm">{step.description}</p>
+                  </div>
                 </Card>
               </div>
-            )
+            );
           })}
         </div>
       </div>
     </section>
-  )
+  );
 }

@@ -6,7 +6,8 @@ import {
   AccordionItem,
   AccordionTrigger,
   AccordionContent,
-} from '@/components/ui/accordion' // Updated import path
+} from '@/components/ui/accordion'
+import { motion } from 'framer-motion'
 
 const faqs = [
   {
@@ -45,8 +46,14 @@ export default function FaqSection() {
   return (
     <section className="w-full py-12 md:py-24 lg:py-32">
       <div className="container px-4 md:px-6">
-        {/* Header */}
-        <div className="flex flex-col items-center justify-center space-y-4 text-center">
+        {/* Header with animation */}
+        <motion.div
+          className="flex flex-col items-center justify-center space-y-4 text-center"
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          viewport={{ once: true }}
+        >
           <div className="space-y-2">
             <div className="inline-block rounded-lg bg-primary/10 px-3 py-1 text-sm text-primary">
               FAQ
@@ -58,20 +65,28 @@ export default function FaqSection() {
               Find answers to common questions about Study Buddy
             </p>
           </div>
-        </div>
+        </motion.div>
 
-        {/* Accordion */}
+        {/* Accordion with staggered animations */}
         <div className="mx-auto max-w-3xl mt-12">
           <Accordion type="single" collapsible className="w-full">
             {faqs.map((faq, idx) => (
-              <AccordionItem key={idx} value={`item-${idx}`}>
-                <AccordionTrigger className="text-left">
-                  {faq.question}
-                </AccordionTrigger>
-                <AccordionContent className="text-muted-foreground">
-                  {faq.answer}
-                </AccordionContent>
-              </AccordionItem>
+              <motion.div
+                key={idx}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: idx * 0.1, duration: 0.4 }}
+                viewport={{ once: true, amount: 0.2 }}
+              >
+                <AccordionItem value={`item-${idx}`}>
+                  <AccordionTrigger className="text-left">
+                    {faq.question}
+                  </AccordionTrigger>
+                  <AccordionContent className="text-muted-foreground">
+                    {faq.answer}
+                  </AccordionContent>
+                </AccordionItem>
+              </motion.div>
             ))}
           </Accordion>
         </div>

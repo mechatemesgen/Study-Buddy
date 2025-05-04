@@ -84,6 +84,22 @@ export function GroupsSection({ groups = [], isLoading }) {
 }
 
 function GroupCard({ group }) {
+  const [copySuccess, setCopySuccess] = useState("");
+  
+  // Function to handle copying the link to clipboard
+  const handleCopyLink = (link) => {
+    navigator.clipboard
+      .writeText(link)
+      .then(() => {
+        setCopySuccess("Link copied!");  // Set success message
+        setTimeout(() => setCopySuccess(""), 3000);  // Hide the message after 3 seconds
+      })
+      .catch(() => setCopySuccess("Failed to copy link"));
+  };
+
+  // Generate an invitation link (This is just a placeholder URL for now)
+  const invitationLink = `https://yourwebsite.com/invite/${group.id}`;
+
   return (
     <div className="flex items-start gap-4 p-3 rounded-lg border hover:bg-muted/50 transition-colors">
       <Avatar className="h-10 w-10">
@@ -127,12 +143,18 @@ function GroupCard({ group }) {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem>Invite Members</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleCopyLink(invitationLink)}>
+              Invite Members
+            </DropdownMenuItem>
             <DropdownMenuItem>Mute Notifications</DropdownMenuItem>
             <DropdownMenuItem className="text-destructive">Leave Group</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
+      {/* Display success message */}
+      {copySuccess && (
+        <p className="mt-2 text-green-500 text-sm">{copySuccess}</p>
+      )}
     </div>
   );
 }

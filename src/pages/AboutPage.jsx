@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { motion } from "framer-motion"; // Import motion from framer-motion
 import TeamSection from "../../src/components/TeamSection";
 import { MissionSection } from "../../src/components/MissionSection";
 import { Button } from "../../src/components/ui/button";
@@ -22,45 +23,58 @@ export default function AboutPage() {
   return (
     <div className="flex min-h-screen flex-col">
       <main className="flex-1">
-        {/* Hero Section */}
-          <section className="w-full py-10 sm:py-14 md:py-20 lg:py-32 bg-muted/30">
-            <div className="container px-4 sm:px-6 md:px-8">
-              <div className="grid gap-10 lg:grid-cols-2 lg:gap-16 items-center">
-                <div className="space-y-4">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight leading-tight">
-              About Study Buddy
-            </h1>
-            <p className="text-muted-foreground text-base sm:text-lg md:text-xl leading-relaxed">
-              We're on a mission to transform how students learn together. Study Buddy was created by a team of
-              educators and technologists who believe in the power of collaborative learning.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3">
-              <Button size="lg" asChild>
-                <Link to="/signup">Join Our Community</Link>
-              </Button>
-              <Button variant="outline" size="lg" onClick={() => {
-                const teamSection = document.getElementById("team");
-                if (teamSection) {
-                  teamSection.scrollIntoView({ behavior: "smooth" });
-                }
-              }}>
-                Meet Our Team
-              </Button>
-            </div>
-                </div>
-                <div className="w-full aspect-video max-w-md sm:max-w-lg md:max-w-[500px] mx-auto rounded-xl overflow-hidden shadow-xl">
-            <img
-              src={AboutUsImg}
-              alt="Study Buddy team"
-              className="object-cover w-full h-full"
-            />
+        {/* Hero Section with Animation */}
+        <motion.section
+          className="w-full py-10 sm:py-14 md:py-20 lg:py-32 bg-muted/30"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, ease: "easeOut" }}
+        >
+          <div className="container px-4 sm:px-6 md:px-8">
+            <div className="grid gap-10 lg:grid-cols-2 lg:gap-16 items-center">
+              <div className="space-y-4">
+                <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight leading-tight">
+                  About Study Buddy
+                </h1>
+                <p className="text-muted-foreground text-base sm:text-lg md:text-xl leading-relaxed">
+                  We're on a mission to transform how students learn together. Study Buddy was created by a team of
+                  educators and technologists who believe in the power of collaborative learning.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <Button size="lg" asChild>
+                    <Link to="/signup">Join Our Community</Link>
+                  </Button>
+                  <Button variant="outline" size="lg" onClick={() => {
+                    const teamSection = document.getElementById("team");
+                    if (teamSection) {
+                      teamSection.scrollIntoView({ behavior: "smooth" });
+                    }
+                  }}>
+                    Meet Our Team
+                  </Button>
                 </div>
               </div>
+              <div className="w-full aspect-video max-w-md sm:max-w-lg md:max-w-[500px] mx-auto rounded-xl overflow-hidden shadow-xl">
+                <motion.img
+                  src={AboutUsImg}
+                  alt="Study Buddy team"
+                  className="object-cover w-full h-full"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 1, ease: "easeIn" }}
+                />
+              </div>
             </div>
-          </section>
+          </div>
+        </motion.section>
 
-          {/* Our Story Section */}
-        <section className="w-full py-10 sm:py-14 md:py-20 lg:py-32">
+        {/* Our Story Section with Animation */}
+        <motion.section
+          className="w-full py-10 sm:py-14 md:py-20 lg:py-32"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, ease: "easeOut" }}
+        >
           <div className="container px-4 sm:px-6 md:px-8">
             <div className="text-center space-y-4">
               <div className="inline-block rounded-lg bg-primary/10 px-3 py-1 text-sm text-primary">Our Story</div>
@@ -82,45 +96,82 @@ export default function AboutPage() {
               </p>
             </div>
           </div>
-        </section>
+        </motion.section>
 
         <MissionSection />
         <TeamSection />
 
-        {/* Stats Section */}
-        <section className="w-full py-10 sm:py-14 md:py-20 lg:py-32 bg-muted/30">
+        {/* Stats Section with Animation */}
+        <motion.section
+          className="w-full py-10 sm:py-14 md:py-20 lg:py-32 bg-muted/30"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1 }}
+        >
           <div className="container px-4 sm:px-6 md:px-8">
             <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4 text-center">
-              <div ref={users.ref} className="space-y-2">
+              <motion.div
+                ref={users.ref}
+                className="space-y-2"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.3, duration: 0.8 }}
+              >
                 <div className="text-4xl sm:text-5xl font-bold text-primary">
                   <CountUp value={users.count} suffix="+" />
                 </div>
                 <p className="text-base font-medium">Active Users</p>
-              </div>
-              <div ref={countries.ref} className="space-y-2">
+              </motion.div>
+
+              <motion.div
+                ref={countries.ref}
+                className="space-y-2"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.6, duration: 0.8 }}
+              >
                 <div className="text-4xl sm:text-5xl font-bold text-primary">
                   <CountUp value={countries.count} suffix="+" />
                 </div>
                 <p className="text-base font-medium">Countries</p>
-              </div>
-              <div ref={universities.ref} className="space-y-2">
+              </motion.div>
+
+              <motion.div
+                ref={universities.ref}
+                className="space-y-2"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.9, duration: 0.8 }}
+              >
                 <div className="text-4xl sm:text-5xl font-bold text-primary">
                   <CountUp value={universities.count} suffix="+" />
                 </div>
                 <p className="text-base font-medium">Universities</p>
-              </div>
-              <div ref={satisfaction.ref} className="space-y-2">
+              </motion.div>
+
+              <motion.div
+                ref={satisfaction.ref}
+                className="space-y-2"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 1.2, duration: 0.8 }}
+              >
                 <div className="text-4xl sm:text-5xl font-bold text-primary">
                   <CountUp value={satisfaction.count} suffix="%" />
                 </div>
                 <p className="text-base font-medium">Student Satisfaction</p>
-              </div>
+              </motion.div>
             </div>
           </div>
-        </section>
+        </motion.section>
 
-        {/* CTA Section */}
-        <section className="w-full py-10 sm:py-14 md:py-20 lg:py-32 bg-primary text-primary-foreground">
+        {/* CTA Section with Animation */}
+        <motion.section
+          className="w-full py-10 sm:py-14 md:py-20 lg:py-32 bg-primary text-primary-foreground"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.5, duration: 1 }}
+        >
           <div className="container px-4 sm:px-6 md:px-8">
             <div className="text-center space-y-4">
               <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight">
@@ -135,7 +186,7 @@ export default function AboutPage() {
               </Button>
             </div>
           </div>
-        </section>
+        </motion.section>
       </main>
     </div>
   );
