@@ -255,7 +255,7 @@ function ResourceCard({ resource }) {
             <CardTitle className="text-lg truncate">{resource.title}</CardTitle>
             <CardDescription>
               <Badge variant="outline" className="mr-2">
-                {resource.type.toUpperCase()}
+                {(resource.type || "").toUpperCase()}
               </Badge>
               {resource.fileSize}
             </CardDescription>

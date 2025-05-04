@@ -51,9 +51,8 @@ export function AuthProvider({ children }) {
   const signup = async (details) => {
     setIsLoading(true)
     try {
-      const data = await apiSignup(details)
-      setUser(data.user)
-      localStorage.setItem('user', JSON.stringify(data.user))
+      await apiSignup(details)
+      // Do NOT setUser or save user to localStorage here
     } finally {
       setIsLoading(false)
     }

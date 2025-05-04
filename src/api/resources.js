@@ -1,7 +1,8 @@
 // Mock API service for resources
 // In a real app, this would connect to your Django REST backend
 
-import { MOCK_DELAY } from "@/config/api-config"
+import axiosInstance from "../config/axiosInstance";
+import { RESOURCE_ENDPOINTS, DASHBOARD_ENDPOINTS } from "../config/api-config";
 
 // Simulated delay for API calls
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
@@ -106,67 +107,186 @@ const mockResources = [
   },
 ]
 
+/**
+ * Fetch all resources
+ * @returns {Promise<Array>} List of resources
+ */
 export async function fetchResources() {
-  // Simulate API call
-  await delay(MOCK_DELAY)
-  return mockResources
+  try {
+    const response = await axiosInstance.get(RESOURCE_ENDPOINTS.LIST);
+    return response.data;
+  } catch (error) {
+    console.error("Failed to fetch resources:", error);
+    throw new Error("Failed to fetch resources");
+  }
 }
 
-export async function fetchGroupResources(groupId) {
-  // Simulate API call
-  await delay(MOCK_DELAY)
-  return mockResources.filter((resource) => resource.groupId === groupId)
+/**
+ * Fetch current user's resources
+ * @returns {Promise<Array>} List of user's resources
+ */
+export async function fetchMyResources() {
+  try {
+    const response = await axiosInstance.get(RESOURCE_ENDPOINTS.MY_RESOURCES);
+    return response.data;
+  } catch (error) {
+    console.error("Failed to fetch my resources:", error);
+    throw new Error("Failed to fetch your resources");
+  }
 }
 
+/**
+ * Fetch a specific resource by ID
+ * @param {string} id - Resource ID
+ * @returns {Promise<Object>} Resource details
+ */
 export async function fetchResource(id) {
-  // Simulate API call
-  await delay(MOCK_DELAY)
-  return mockResources.find((resource) => resource.id === id) || null
+  try {
+    const response = await axiosInstance.get(RESOURCE_ENDPOINTS.DETAIL(id));
+    return response.data;
+  } catch (error) {
+    console.error(`Failed to fetch resource ${id}:`, error);
+    throw new Error("Failed to fetch resource details");
+  }
 }
 
+/**
+ * Upload a new resource
+ * @param {Object} data - Resource data
+ * @param {File} data.file - File to upload
+ * @param {string} data.title - Resource title
+ * @param {string} data.description - Resource description
+ * @param {Array<string>} data.tags - Resource tags
+ * @param {string} [data.group_id] - Group ID if associated with a group
+ * @returns {Promise<Object>} New resource data
+ */
 export async function uploadResource(data) {
-  // Simulate API call
-  await delay(MOCK_DELAY * 1.5)
-
-  const file = data.files[0]
-  const fileExtension = file.name.split(".").pop() || ""
-
-  const newResource = {
-    id: String(mockResources.length + 1),
-    title: data.title || file.name,
-    type: fileExtension,
-    uploadedBy: "Current User",
-    uploadedAt: "Just now",
-    uploadedDate: new Date(),
-    fileSize: `${(file.size / (1024 * 1024)).toFixed(1)} MB`,
-    downloadUrl: "#",
-    previewUrl: "#",
-    description: data.description || "",
-    groupId: data.groupId,
-    isFavorite: false,
-    downloadCount: 0,
-    tags: data.tags || [],
+  try {
+    const formData = new FormData();
+    formData.append('file', data.file);
+    formData.append('title', data.title);
+    
+    if (data.description) formData.append('description', data.description);
+    if (data.group_id) formData.append('group', data.group_id);
+    if (data.tags && data.tags.length > 0) {
+      data.tags.forEach((tag, index) => {
+        formData.append(`tags[${index}]`, tag);
+      });
+    }
+    
+    const response = await axiosInstance.post(RESOURCE_ENDPOINTS.CREATE, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    
+    return response.data;
+  } catch (error) {
+    console.error("Failed to upload resource:", error);
+    throw new Error(
+      error.response?.data?.detail || 
+      error.response?.data?.file?.[0] || 
+      "Failed to upload resource"
+    );
   }
-
-  mockResources.push(newResource)
-  return newResource
 }
 
-export async function downloadResource(id) {
-  // Simulate API call
-  await delay(MOCK_DELAY / 2)
-
-  const resource = mockResources.find((r) => r.id === id)
-  if (resource) {
-    // Increment download count
-    resource.downloadCount += 1
-
-    // In a real app, this would trigger a file download
-    // For now, we'll just return success
-    return { success: true, resource }
+/**
+ * Update a resource
+ * @param {string} id - Resource ID
+ * @param {Object} data - Updated resource data
+ * @returns {Promise<Object>} Updated resource data
+ */
+export async function updateResource(id, data) {
+  try {
+    const response = await axiosInstance.patch(RESOURCE_ENDPOINTS.UPDATE(id), data);
+    return response.data;
+  } catch (error) {
+    console.error(`Failed to update resource ${id}:`, error);
+    throw new Error("Failed to update resource");
   }
+}
 
-  return { success: false, error: "Resource not found" }
+/**
+ * Delete a resource
+ * @param {string} id - Resource ID
+ * @returns {Promise<void>}
+ */
+export async function deleteResource(id) {
+  try {
+    await axiosInstance.delete(RESOURCE_ENDPOINTS.DELETE(id));
+  } catch (error) {
+    console.error(`Failed to delete resource ${id}:`, error);
+    throw new Error("Failed to delete resource");
+  }
+}
+
+/**
+ * Download a resource
+ * @param {string} id - Resource ID
+ * @returns {Promise<void>} Triggers browser download
+ */
+export async function downloadResource(id) {
+  try {
+    // Always use the backend download endpoint
+    const token = localStorage.getItem('accessToken');
+    const url = RESOURCE_ENDPOINTS.DOWNLOAD(id);
+    const response = await axiosInstance.get(url, {
+      responseType: 'blob',
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    });
+    // Try to get filename from Content-Disposition header
+    let filename = 'resource';
+    const disposition = response.headers['content-disposition'];
+    if (disposition && disposition.indexOf('filename=') !== -1) {
+      filename = disposition.split('filename=')[1].replace(/"/g, '').trim();
+    }
+    // Create a blob and trigger download
+    const blobUrl = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement('a');
+    link.href = blobUrl;
+    link.setAttribute('download', filename);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(blobUrl);
+    return { success: true };
+  } catch (error) {
+    console.error(`Failed to download resource ${id}:`, error);
+    throw new Error("Failed to download resource");
+  }
+}
+
+/**
+ * Fetch all resource categories
+ * @returns {Promise<Array>} List of resource categories
+ */
+export async function fetchResourceCategories() {
+  try {
+    const response = await axiosInstance.get(RESOURCE_ENDPOINTS.CATEGORIES);
+    return response.data;
+  } catch (error) {
+    console.error("Failed to fetch resource categories:", error);
+    throw new Error("Failed to fetch resource categories");
+  }
+}
+
+/**
+ * Fetch resources for a specific group
+ * @param {string} groupId - Group ID
+ * @returns {Promise<Array>} List of group's resources
+ */
+export async function fetchGroupResources(groupId) {
+  try {
+    // Use query parameter to filter resources by group
+    const response = await axiosInstance.get(RESOURCE_ENDPOINTS.LIST, {
+      params: { group: groupId }
+    });
+    return response.data;
+  } catch (error) {
+    console.error(`Failed to fetch resources for group ${groupId}:`, error);
+    throw new Error("Failed to fetch group resources");
+  }
 }
 
 export async function toggleFavorite(id) {

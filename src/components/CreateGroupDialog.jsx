@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom"; // React Router instead of Next.js
 import {
   Dialog,
@@ -13,29 +13,102 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/toast";
-import { createGroup } from "@/api/groups";
+import { createGroup, fetchSubjects } from "@/api/groups";
+import {
+  Select,
+  SelectTrigger,
+  SelectContent,
+  SelectItem,
+  SelectValue,
+} from "@/components/ui/select";
 
 export function CreateGroupDialog({ open, onOpenChange }) {
   const navigate = useNavigate(); // useNavigate for routing in Vite
   const { toast } = useToast();
   const [formData, setFormData] = useState({
     name: "",
-    subject: "",
+    subject_id: "",
     description: "",
+    privacy: "public",
   });
+  const [subjects, setSubjects] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isSubjectsLoading, setIsSubjectsLoading] = useState(false);
+  const [subjectMode, setSubjectMode] = useState("select"); // "select" or "new"
+  const [newSubject, setNewSubject] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
+
+  useEffect(() => {
+    if (open) {
+      setIsSubjectsLoading(true);
+      fetchSubjects()
+        .then((data) => setSubjects(data))
+        .catch(() => setSubjects([]))
+        .finally(() => setIsSubjectsLoading(false));
+      setSubjectMode("select");
+      setNewSubject("");
+      setFormData((prev) => ({ ...prev, subject_id: "" }));
+    }
+  }, [open]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleSelectChange = (name, value) => {
+    if (name === "subject_id") {
+      if (value === "__new__") {
+        setSubjectMode("new");
+        setFormData((prev) => ({ ...prev, subject_id: "" }));
+      } else {
+        setSubjectMode("select");
+        setFormData((prev) => ({ ...prev, subject_id: value }));
+      }
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+    setErrorMsg("");
+
+    // Frontend validation
+    if (!formData.name.trim()) {
+      setErrorMsg("Group name is required.");
+      setIsLoading(false);
+      return;
+    }
+    if (subjectMode === "new" && !newSubject.trim()) {
+      setErrorMsg("Subject name is required.");
+      setIsLoading(false);
+      return;
+    }
+    if (subjectMode === "select" && !formData.subject_id) {
+      setErrorMsg("Please select a subject.");
+      setIsLoading(false);
+      return;
+    }
+    if (!formData.description.trim()) {
+      setErrorMsg("Description is required.");
+      setIsLoading(false);
+      return;
+    }
 
     try {
-      const newGroup = await createGroup(formData);
+      let payload = {
+        name: formData.name,
+        description: formData.description,
+        privacy: formData.privacy,
+      };
+      if (subjectMode === "new" && newSubject.trim()) {
+        payload.subject_name = newSubject.trim();
+      } else if (formData.subject_id) {
+        payload.subject_id = Number(formData.subject_id);
+      }
+      const newGroup = await createGroup(payload);
       toast({
         title: "Group created",
         description: `${formData.name} has been created successfully.`,
@@ -43,9 +116,10 @@ export function CreateGroupDialog({ open, onOpenChange }) {
       onOpenChange(false);
       navigate(`/dashboard/groups/${newGroup.id}`); // React Router navigation
     } catch (error) {
+      setErrorMsg(error.message || "There was an error creating your study group. Please try again.");
       toast({
         title: "Failed to create group",
-        description: "There was an error creating your study group. Please try again.",
+        description: error.message || "There was an error creating your study group. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -61,6 +135,9 @@ export function CreateGroupDialog({ open, onOpenChange }) {
           <DialogDescription>Create a new study group to collaborate with others.</DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
+          {errorMsg && (
+            <div className="text-red-500 text-sm mb-2">{errorMsg}</div>
+          )}
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
               <Label htmlFor="name">Group Name</Label>
@@ -74,15 +151,57 @@ export function CreateGroupDialog({ open, onOpenChange }) {
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="subject">Subject</Label>
-              <Input
-                id="subject"
-                name="subject"
-                value={formData.subject}
-                onChange={handleChange}
-                placeholder="e.g., Mathematics, Biology, Computer Science"
+              <Label htmlFor="subject_id">Subject</Label>
+              {subjectMode === "select" && (
+                <Select
+                  value={formData.subject_id}
+                  onValueChange={(value) => handleSelectChange("subject_id", value)}
+                  disabled={isSubjectsLoading}
+                  required
+                >
+                  <SelectTrigger id="subject_id">
+                    <SelectValue placeholder={isSubjectsLoading ? "Loading..." : "Select a subject"} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {subjects.map((subject) => (
+                      <SelectItem key={subject.id} value={String(subject.id)}>
+                        {subject.name}
+                      </SelectItem>
+                    ))}
+                    <SelectItem value="__new__">Other (Add new subject)</SelectItem>
+                  </SelectContent>
+                </Select>
+              )}
+              {subjectMode === "new" && (
+                <div className="flex gap-2 items-center">
+                  <Input
+                    id="new-subject"
+                    value={newSubject}
+                    onChange={(e) => setNewSubject(e.target.value)}
+                    placeholder="Enter new subject name"
+                    required
+                  />
+                  <Button type="button" variant="outline" onClick={() => setSubjectMode("select")}>
+                    Back
+                  </Button>
+                </div>
+              )}
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="privacy">Privacy</Label>
+              <Select
+                value={formData.privacy}
+                onValueChange={(value) => handleSelectChange("privacy", value)}
                 required
-              />
+              >
+                <SelectTrigger id="privacy">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="public">Public</SelectItem>
+                  <SelectItem value="private">Private</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             <div className="grid gap-2">
               <Label htmlFor="description">Description</Label>

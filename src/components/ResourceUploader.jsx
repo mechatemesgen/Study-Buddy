@@ -54,6 +54,14 @@ export function ResourceUploader({ groupId, open, onOpenChange }) {
       })
       return
     }
+    if (files.length > 1) {
+      toast({
+        title: "Only one file allowed",
+        description: "Please select only one file to upload at a time.",
+        variant: "destructive",
+      })
+      return
+    }
 
     setIsUploading(true)
     setProgress(0)
@@ -70,11 +78,15 @@ export function ResourceUploader({ groupId, open, onOpenChange }) {
         })
       }, 200)
 
-      await uploadResource({
-        groupId,
+      // Prepare correct payload for backend
+      const payload = {
+        file: files[0],
         title: title || files[0].name,
-        files,
-      })
+      }
+      if (groupId) {
+        payload.groups = [groupId]
+      }
+      await uploadResource(payload)
 
       clearInterval(interval)
       setProgress(100)
@@ -93,7 +105,7 @@ export function ResourceUploader({ groupId, open, onOpenChange }) {
     } catch (error) {
       toast({
         title: "Upload failed",
-        description: "There was an error uploading your resource. Please try again.",
+        description: error.message || "There was an error uploading your resource. Please try again.",
         variant: "destructive",
       })
     } finally {

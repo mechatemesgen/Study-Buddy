@@ -1,7 +1,8 @@
 // Mock API service for study sessions
 // In a real app, this would connect to your Django REST backend
 
-import { MOCK_DELAY } from "@/config/api-config"
+import axiosInstance from "../config/axiosInstance";
+import { DASHBOARD_ENDPOINTS } from "../config/api-config";
 
 // Simulated delay for API calls
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
@@ -138,107 +139,130 @@ const mockSessions = [
   },
 ]
 
+/**
+ * Fetch all study sessions
+ * @returns {Promise<Array>} List of study sessions
+ */
 export async function fetchSessions() {
-  // Simulate API call
-  await delay(MOCK_DELAY)
-  return mockSessions
+  try {
+    const response = await axiosInstance.get(DASHBOARD_ENDPOINTS.SESSIONS.LIST);
+    return response.data;
+  } catch (error) {
+    console.error("Failed to fetch sessions:", error);
+    throw new Error("Failed to fetch study sessions");
+  }
 }
 
-export async function fetchGroupSessions(groupId) {
-  // Simulate API call
-  await delay(MOCK_DELAY)
-  return mockSessions.filter((session) => session.groupId === groupId)
-}
-
+/**
+ * Fetch a specific study session by ID
+ * @param {string} id - Session ID
+ * @returns {Promise<Object>} Study session details
+ */
 export async function fetchSession(id) {
-  // Simulate API call
-  await delay(MOCK_DELAY)
-  return mockSessions.find((session) => session.id === id) || null
+  try {
+    const response = await axiosInstance.get(DASHBOARD_ENDPOINTS.SESSIONS.DETAIL(id));
+    return response.data;
+  } catch (error) {
+    console.error(`Failed to fetch session ${id}:`, error);
+    throw new Error("Failed to fetch session details");
+  }
 }
 
+/**
+ * Create a new study session
+ * @param {Object} data - Session data
+ * @returns {Promise<Object>} New session data
+ */
 export async function scheduleSession(data) {
-  // Simulate API call
-  await delay(MOCK_DELAY)
-
-  const newSession = {
-    id: String(mockSessions.length + 1),
-    title: data.title,
-    start: data.start,
-    end: data.end,
-    groupId: data.groupId,
-    groupName:
-      data.groupId === "1"
-        ? "Calculus Study Group"
-        : data.groupId === "2"
-          ? "Computer Science 101"
-          : data.groupId === "3"
-            ? "Biology Research Team"
-            : "Unknown Group",
-    description: data.description || "",
-    agenda: data.agenda || [],
-    location: data.location || "",
-    attendees: [
-      { id: "1", name: "John Doe", avatar: "", isHost: true }, // Current user as host
-    ],
-    maxAttendees: data.maxAttendees || null,
-    isVirtual: data.isVirtual || false,
-    meetingLink: data.meetingLink || "",
-    materials: [],
-    status: "upcoming",
+  try {
+    const response = await axiosInstance.post(DASHBOARD_ENDPOINTS.SESSIONS.LIST, data);
+    return response.data;
+  } catch (error) {
+    console.error("Failed to schedule session:", error);
+    throw new Error(
+      error.response?.data?.detail || 
+      error.response?.data?.title?.[0] || 
+      "Failed to schedule study session"
+    );
   }
-
-  mockSessions.push(newSession)
-  return newSession
 }
 
+/**
+ * Update an existing study session
+ * @param {string} id - Session ID
+ * @param {Object} data - Updated session data
+ * @returns {Promise<Object>} Updated session data
+ */
+export async function updateSession(id, data) {
+  try {
+    const response = await axiosInstance.patch(DASHBOARD_ENDPOINTS.SESSIONS.DETAIL(id), data);
+    return response.data;
+  } catch (error) {
+    console.error(`Failed to update session ${id}:`, error);
+    throw new Error("Failed to update study session");
+  }
+}
+
+/**
+ * Delete a study session
+ * @param {string} id - Session ID
+ * @returns {Promise<void>}
+ */
+export async function deleteSession(id) {
+  try {
+    await axiosInstance.delete(DASHBOARD_ENDPOINTS.SESSIONS.DETAIL(id));
+  } catch (error) {
+    console.error(`Failed to delete session ${id}:`, error);
+    throw new Error("Failed to delete study session");
+  }
+}
+
+/**
+ * Join a study session
+ * @param {string} id - Session ID
+ * @returns {Promise<Object>} Updated session data
+ */
 export async function joinSession(id) {
-  // Simulate API call
-  await delay(MOCK_DELAY / 2)
-
-  const session = mockSessions.find((s) => s.id === id)
-  if (session) {
-    // Check if user is already in attendees
-    const isAlreadyJoined = session.attendees.some((a) => a.id === "1") // Current user ID
-
-    if (!isAlreadyJoined) {
-      // Check if session is full
-      if (session.maxAttendees && session.attendees.length >= session.maxAttendees) {
-        return { success: false, error: "Session is full" }
-      }
-
-      // Add user to attendees
-      session.attendees.push({ id: "1", name: "John Doe", avatar: "", isHost: false })
-    }
-
-    return { success: true, session }
+  try {
+    const response = await axiosInstance.post(DASHBOARD_ENDPOINTS.SESSIONS.JOIN(id));
+    return response.data;
+  } catch (error) {
+    console.error(`Failed to join session ${id}:`, error);
+    throw new Error("Failed to join study session");
   }
-
-  return { success: false, error: "Session not found" }
 }
 
+/**
+ * Leave a study session
+ * @param {string} id - Session ID
+ * @returns {Promise<Object>} Updated session data
+ */
 export async function leaveSession(id) {
-  // Simulate API call
-  await delay(MOCK_DELAY / 2)
-
-  const session = mockSessions.find((s) => s.id === id)
-  if (session) {
-    // Check if user is in attendees
-    const attendeeIndex = session.attendees.findIndex((a) => a.id === "1") // Current user ID
-
-    if (attendeeIndex !== -1) {
-      // Check if user is the host
-      if (session.attendees[attendeeIndex].isHost) {
-        return { success: false, error: "Host cannot leave the session" }
-      }
-
-      // Remove user from attendees
-      session.attendees.splice(attendeeIndex, 1)
-    }
-
-    return { success: true }
+  try {
+    const response = await axiosInstance.post(DASHBOARD_ENDPOINTS.SESSIONS.LEAVE(id));
+    return response.data;
+  } catch (error) {
+    console.error(`Failed to leave session ${id}:`, error);
+    throw new Error("Failed to leave study session");
   }
+}
 
-  return { success: false, error: "Session not found" }
+/**
+ * Fetch sessions for a specific group
+ * @param {string} groupId - Group ID
+ * @returns {Promise<Array>} List of group's sessions
+ */
+export async function fetchGroupSessions(groupId) {
+  try {
+    // Use query parameter to filter sessions by group
+    const response = await axiosInstance.get(DASHBOARD_ENDPOINTS.SESSIONS.LIST, {
+      params: { group: groupId }
+    });
+    return response.data;
+  } catch (error) {
+    console.error(`Failed to fetch sessions for group ${groupId}:`, error);
+    throw new Error("Failed to fetch group study sessions");
+  }
 }
 
 export async function addSessionMaterial(sessionId, resourceId) {

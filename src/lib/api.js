@@ -2,7 +2,7 @@ import axiosInstance from "@/config/axiosInstance";
 import {
   AUTH_ENDPOINTS,
   GROUP_ENDPOINTS,
-  SESSION_ENDPOINTS,
+  DASHBOARD_ENDPOINTS,
   RESOURCE_ENDPOINTS,
   MOCK_DELAY,
 } from "@/config/api-config";
@@ -46,7 +46,7 @@ export async function fetchSessions() {
   if (useMockApi) {
     return mockResponse(mockSessions);
   }
-  return axiosInstance.get(SESSION_ENDPOINTS.LIST);
+  return axiosInstance.get(DASHBOARD_ENDPOINTS.SESSIONS.LIST);
 }
 
 // Add more API functions for groups, chat, resources, etc. following this pattern.

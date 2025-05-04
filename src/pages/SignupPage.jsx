@@ -51,10 +51,11 @@ export default function SignupPage() {
         name: formData.name,
         email: formData.email,
         password: formData.password,
+        confirmPassword: formData.confirmPassword,
       })
-      navigate('/dashboard')
+      navigate('/login')
     } catch (err) {
-      setError('Failed to create account. Please try again.')
+      setError(err.message || 'Failed to create account. Please try again.')
     } finally {
       setIsLoading(false)
     }

@@ -6,6 +6,8 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { FileText, FileImage, FileCode, File, Upload, Download, MoreHorizontal } from "lucide-react"
 import { ResourceUploader } from "@/components/ResourceUploader"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { downloadResource } from "@/api/resources"
+import { useToast } from "@/components/ui/toast"
 
 export function ResourcesSection({ resources = [], isLoading }) {
   const [isUploaderOpen, setIsUploaderOpen] = useState(false)
@@ -83,6 +85,8 @@ export function ResourcesSection({ resources = [], isLoading }) {
 }
 
 function ResourceCard({ resource }) {
+  const { toast } = useToast();
+
   const getFileIcon = (type) => {
     switch (type) {
       case "pdf":
@@ -106,6 +110,31 @@ function ResourceCard({ resource }) {
     }
   }
 
+  const handleDownload = async () => {
+    try {
+      await downloadResource(resource.id);
+      if (resource.downloadUrl && resource.downloadUrl !== "#") {
+        // Create a temporary link to trigger download
+        const link = document.createElement("a");
+        link.href = resource.downloadUrl;
+        link.download = resource.title || "resource";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+      toast({
+        title: "Download started",
+        description: "Your file is being downloaded.",
+      });
+    } catch (error) {
+      toast({
+        title: "Download failed",
+        description: error.message || "There was an error downloading the file. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <div className="p-3 rounded-lg border hover:bg-muted/50 transition-colors">
       <div className="flex items-start gap-3">
@@ -121,7 +150,7 @@ function ResourceCard({ resource }) {
           </div>
         </div>
         <div className="flex items-center">
-          <Button variant="ghost" size="icon" className="h-8 w-8">
+          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleDownload}>
             <Download className="h-4 w-4" />
             <span className="sr-only">Download</span>
           </Button>
@@ -136,6 +165,9 @@ function ResourceCard({ resource }) {
               <DropdownMenuItem>Preview</DropdownMenuItem>
               <DropdownMenuItem>Share</DropdownMenuItem>
               <DropdownMenuItem>Add to Favorites</DropdownMenuItem>
+              <DropdownMenuItem disabled>
+                {(resource.type || "").toUpperCase()}
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

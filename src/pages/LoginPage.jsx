@@ -36,7 +36,7 @@ export default function LoginPage() {
       await login({ email, password });
       navigate("/dashboard");
     } catch (err) {
-      setError("Invalid email or password. Please try again.");
+      setError(err.message || "Invalid email or password. Please try again.");
     } finally {
       setIsLoading(false);
     } 
