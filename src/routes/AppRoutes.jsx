@@ -10,6 +10,7 @@ import Dashboard from '../pages/Dashboard'
 import PageNotFound from '../pages/PageNotFound'
 import { useAuth } from '../hooks/use-auth'
 import ContactUs from '@/pages/ContactUs'
+import Calendar from '@/components/calendar'
 
 export default function AppRoutes() {
   const { user } = useAuth()
@@ -23,6 +24,7 @@ export default function AppRoutes() {
         <Route path="contact" element={<ContactUs />} />
         <Route path="login" element={<LoginPage />} />
         <Route path="signup" element={<SignupPage />} />
+        <Route path="calender" element={<Calendar />} />
       </Route>
 
       {/* protected dashboard (no Navbar/Footer) */}

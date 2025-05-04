@@ -1,6 +1,9 @@
 import { Calendar, Users, Clock, FileText } from "lucide-react"
+import { useNavigate } from 'react-router-dom';
 
 export function FeatureSection() {
+  const navigate = useNavigate();
+
   const features = [
     {
       icon: Users,
@@ -13,6 +16,7 @@ export function FeatureSection() {
       title: "Interactive Study Planner",
       description:
         "Plan and organize your study sessions with an interactive calendar that syncs with your group members.",
+      onClick: () => navigate("/calendar"), // ✅ Add navigation function
     },
     {
       icon: Clock,
@@ -48,7 +52,8 @@ export function FeatureSection() {
             return (
               <div
                 key={index}
-                className="flex flex-col items-center space-y-4 rounded-lg border p-6 shadow-sm transition-all hover:shadow-md"
+                className="flex flex-col items-center space-y-4 rounded-lg border p-6 shadow-sm transition-all hover:shadow-md cursor-pointer"
+                onClick={feature.onClick ? feature.onClick : undefined} // ✅ Make it clickable
               >
                 <div className="rounded-full bg-primary/10 p-3">
                   <Icon className="h-6 w-6 text-primary" />

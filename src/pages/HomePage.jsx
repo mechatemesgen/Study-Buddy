@@ -7,9 +7,17 @@ import HowItWorksSection from "@/components/HowItWorksSection";
 import TestimonialsSection from "@/components/TestimonialsSection";
 import StatsSection from "../components/StatsSection";
 import  FaqSection  from "@/components/FaqSection";
-
+import { useSnack } from './snack';
+import { ContinuousCalendar } from '../components/calendar';
+const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 export default function HomePage() {
+  const { createSnack } = useSnack();
+
+  const onClickHandler = (day, month, year) => {
+    const snackMessage = `Clicked on ${monthNames[month]} ${day}, ${year}`;
+    createSnack(snackMessage, 'success');}
   return (
+    
     <div className="min-h-screen bg-background">
       <main>
         <div id="hero">
@@ -62,6 +70,11 @@ export default function HomePage() {
           </div>
         </section>
       </main>
+      <div className="relative flex h-screen max-h-screen w-full flex-col gap-4 px-4 pt-4 items-center justify-center">
+      <div className="relative h-full overflow-auto mt-20">
+        <ContinuousCalendar onClick={onClickHandler} />
+      </div>
+    </div>
     </div>
   );
 }
