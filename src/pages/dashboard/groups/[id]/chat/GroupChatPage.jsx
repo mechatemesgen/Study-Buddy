@@ -9,7 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/ScrollArea";
 import { useToast } from "@/components/ui/toast";
 import { useGroup } from "@/hooks/use-group";
-import { fetchGroupChat, sendMessage } from "@/api/chat";
+import { fetchGroupChats, sendGroupChatMessage } from "@/api/groups";
 import { formatTime } from "@/lib/utils";
 import { Send, Paperclip, FileImage, FileText, Download, ChevronDown } from "lucide-react";
 
@@ -41,7 +41,7 @@ export default function GroupChatPage() {
   useEffect(() => {
     const loadChat = async () => {
       try {
-        const chatMessages = await fetchGroupChat(id);
+        const chatMessages = await fetchGroupChats(id);
         setMessages(chatMessages);
       } catch (error) {
         toast({
@@ -70,7 +70,16 @@ export default function GroupChatPage() {
     setIsSending(true);
 
     try {
-      const sentMessage = await sendMessage(id, newMessage, attachments);
+      let payload;
+      if (attachments.length > 0) {
+        payload = new FormData();
+        payload.append('message', newMessage);
+        payload.append('group', id); // Add group ID for backend
+        attachments.forEach(file => payload.append('attachments', file)); // plural key for backend
+      } else {
+        payload = { message: newMessage, group: id }; // Add group ID for backend
+      }
+      const sentMessage = await sendGroupChatMessage(id, payload);
       setMessages((prev) => [...prev, { ...sentMessage, userName: user.name, userAvatar: user.avatar }]);
       setNewMessage("");
       setAttachments([]);
@@ -93,6 +102,13 @@ export default function GroupChatPage() {
     const files = Array.from(e.target.files);
     setAttachments((prev) => [...prev, ...files]);
   };
+
+  if (isGroupLoading) {
+    return <DashboardLayout><div className="text-center py-12">Loading chat...</div></DashboardLayout>;
+  }
+  if (!group?.is_member) {
+    return <DashboardLayout><div className="text-center py-12">You are not a member of this group.</div></DashboardLayout>;
+  }
 
   return (
     <DashboardLayout>
@@ -195,11 +211,11 @@ export default function GroupChatPage() {
               className="flex-1"
               disabled={isSending}
             />
-            <Button type="submit" disabled={isSending} className="h-8 w-8">
+            <Button type="submit" disabled={isSending} className="h-8 w-16">
               {isSending ? (
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mx-auto"></div>
               ) : (
-                <Send className="h-4 w-4" />
+                "Send"
               )}
             </Button>
           </form>

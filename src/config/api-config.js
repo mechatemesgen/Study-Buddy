@@ -54,6 +54,7 @@ export const GROUP_ENDPOINTS = {
   CREATE: "/studygroup/groups/",
   UPDATE: (id) => `/studygroup/groups/${id}/`,
   DELETE: (id) => `/studygroup/groups/${id}/`,
+  JOIN: (id) => `/studygroup/groups/${id}/join/`, // Added JOIN endpoint
   SUBJECTS: "/studygroup/subjects/",
   CHATS: {
     LIST: (group_id) => `/studygroup/groups/${group_id}/chats/`,

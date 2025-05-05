@@ -13,11 +13,16 @@ import { CreateGroupDialog } from "@/components/CreateGroupDialog";
 import { useGroups } from "@/hooks/use-groups";
 import { Users, Search, Plus, MessageSquare, MoreHorizontal } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { leaveGroup } from "@/api/groups";
 
 export default function GroupsPage() {
-  const { groups, isLoading } = useGroups();
+  const { groups, isLoading, refetch } = useGroups();
   const [searchQuery, setSearchQuery] = useState("");
   const [isCreateGroupOpen, setIsCreateGroupOpen] = useState(false);
+
+  const handleGroupLeave = (groupId) => {
+    refetch(); // Refresh the groups list after leaving a group
+  };
 
   const filteredGroups = searchQuery
     ? groups?.filter(
@@ -71,6 +76,7 @@ export default function GroupsPage() {
             groups={filteredGroups}
             emptyMessage="No study groups available."
             onCreateGroup={() => setIsCreateGroupOpen(true)}
+            onGroupLeave={handleGroupLeave}
           />
         </TabsContent>
 
@@ -81,6 +87,7 @@ export default function GroupsPage() {
             groups={filteredGroups}
             emptyMessage="You haven't joined any study groups yet."
             onCreateGroup={() => setIsCreateGroupOpen(true)}
+            onGroupLeave={handleGroupLeave}
           />
         </TabsContent>
 
@@ -94,7 +101,7 @@ export default function GroupsPage() {
                 <h2 className="text-xl font-bold">{subject}</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {subjectGroups.map((group) => (
-                    <GroupCard key={group.id} group={group} />
+                    <GroupCard key={group.id} group={group} onGroupLeave={handleGroupLeave} />
                   ))}
                 </div>
               </div>
@@ -110,14 +117,14 @@ export default function GroupsPage() {
   );
 }
 
-function GroupsContent({ isLoading, groups, emptyMessage, onCreateGroup }) {
+function GroupsContent({ isLoading, groups, emptyMessage, onCreateGroup, onGroupLeave }) {
   if (isLoading) return <LoadingState />;
   if (!groups || groups.length === 0) return <EmptyState message={emptyMessage} onCreateGroup={onCreateGroup} />;
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {groups.map((group) => (
-        <GroupCard key={group.id} group={group} />
+        <GroupCard key={group.id} group={group} onGroupLeave={onGroupLeave} />
       ))}
     </div>
   );
@@ -143,7 +150,7 @@ function EmptyState({ message, onCreateGroup }) {
   );
 }
 
-function GroupCard({ group }) {
+function GroupCard({ group, onGroupLeave }) {
   const inviteLink = `${window.location.origin}/invite/${group.id}`;
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
 
@@ -153,6 +160,16 @@ function GroupCard({ group }) {
     }).catch(() => {
       toast.error("Failed to copy the invite link.");
     });
+  };
+
+  const handleLeaveGroup = async () => {
+    try {
+      await leaveGroup(group.id);
+      toast.success(`You have left the group: ${group.name}`);
+      onGroupLeave(group.id); // Update the parent state
+    } catch (error) {
+      toast.error(error.message || "Failed to leave the group. Please try again.");
+    }
   };
 
   return (
@@ -171,7 +188,7 @@ function GroupCard({ group }) {
                   <Badge variant="outline" className="text-xs">New</Badge>
                 )}
               </div>
-              <CardDescription>{group.subject}</CardDescription>
+              <CardDescription>{group.subject.name}</CardDescription>
             </div>
           </div>
         </CardHeader>
@@ -204,14 +221,13 @@ function GroupCard({ group }) {
               <DropdownMenuContent align="end">
                 <DropdownMenuItem onClick={() => setIsInviteModalOpen(true)}>Invite Members</DropdownMenuItem>
                 <DropdownMenuItem>Mute Notifications</DropdownMenuItem>
-                <DropdownMenuItem className="text-destructive">Leave Group</DropdownMenuItem>
+                <DropdownMenuItem className="text-destructive" onClick={handleLeaveGroup}>Leave Group</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
         </CardContent>
       </Card>
 
-      {/* ✅ MOVE DIALOG OUTSIDE OF CARD */}
       <Dialog open={isInviteModalOpen} onOpenChange={setIsInviteModalOpen}>
         <DialogContent>
           <DialogTitle>Invite Members to {group.name}</DialogTitle>

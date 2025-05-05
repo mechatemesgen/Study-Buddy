@@ -259,21 +259,15 @@ export async function fetchGroupChats(groupId) {
  * Send a message to a group chat
  * @param {string} groupId - Group ID
  * @param {Object} messageData - Message data
- * @param {string} messageData.message - Message content
- * @param {File} [messageData.attachment] - Optional file attachment
  * @returns {Promise<Object>} New message data
  */
 export async function sendGroupChatMessage(groupId, messageData) {
   try {
-    // If there's an attachment, use FormData
-    if (messageData.attachment) {
-      const formData = new FormData();
-      formData.append('message', messageData.message);
-      formData.append('attachment', messageData.attachment);
-      
+    // If messageData is FormData, send as is (for attachments)
+    if (messageData instanceof FormData) {
       const response = await axiosInstance.post(
         GROUP_ENDPOINTS.CHATS.SEND(groupId),
-        formData,
+        messageData, // FormData includes 'message', 'group', and 'attachments'
         {
           headers: {
             'Content-Type': 'multipart/form-data',
@@ -281,16 +275,19 @@ export async function sendGroupChatMessage(groupId, messageData) {
         }
       );
       return response.data;
-    } else {
-      // Regular JSON request for text-only messages
-      const response = await axiosInstance.post(
-        GROUP_ENDPOINTS.CHATS.SEND(groupId),
-        { message: messageData.message }
-      );
-      return response.data;
     }
+    // Regular JSON request for text-only messages
+    const response = await axiosInstance.post(
+      GROUP_ENDPOINTS.CHATS.SEND(groupId),
+      messageData // JSON payload includes 'message' and 'group'
+    );
+    return response.data;
   } catch (error) {
     console.error(`Failed to send chat message to group ${groupId}:`, error);
+    // Log the detailed error response if available
+    if (error.response) {
+      console.error("Backend error response:", error.response.data);
+    }
     throw new Error("Failed to send message");
   }
 }
@@ -308,5 +305,41 @@ export async function fetchGroupChatMessage(groupId, messageId) {
   } catch (error) {
     console.error(`Failed to fetch chat message ${messageId} from group ${groupId}:`, error);
     throw new Error("Failed to fetch chat message");
+  }
+}
+
+/**
+ * Join a study group
+ * @param {string} id - Group ID
+ * @returns {Promise<Object>} Confirmation message
+ */
+export async function joinGroup(id) {
+  try {
+    const response = await axiosInstance.post(GROUP_ENDPOINTS.JOIN(id));
+    return response.data;
+  } catch (error) {
+    console.error(`Failed to join group ${id}:`, error);
+    const errorMsg = 
+      error.response?.data?.detail || 
+      "Failed to join study group. You might already be a member or the group is private.";
+    throw new Error(errorMsg);
+  }
+}
+
+/**
+ * Leave a study group
+ * @param {string} id - Group ID
+ * @returns {Promise<Object>} Confirmation message
+ */
+export async function leaveGroup(id) {
+  try {
+    const response = await axiosInstance.post(GROUP_ENDPOINTS.LEAVE(id));
+    return response.data;
+  } catch (error) {
+    console.error(`Failed to leave group ${id}:`, error);
+    const errorMsg =
+      error.response?.data?.detail ||
+      "Failed to leave the study group. Please try again.";
+    throw new Error(errorMsg);
   }
 }
