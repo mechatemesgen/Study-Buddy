@@ -8,7 +8,7 @@ import { Card } from './ui/card';
 import JoinStudyGroups from '../../src/assets/JoinStudyGroups.jpg';
 import ScheduleStudySessions from '../../src/assets/ScheduleStudySessions.jpg';
 import ShareStudyResources from '../../src/assets/ShareStudyResources.jpg';
-import CollaborateinRealTime from '../../src/assets/CollaborateinRealTime.jpg';
+import CollaborateinRealTime from '../../src/assets/CollaborateinRealtime.jpg';
 
 const steps = [
   {
