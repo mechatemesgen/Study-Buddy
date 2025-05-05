@@ -8,7 +8,7 @@ import { cn } from "../../lib/utils";
 import { Button } from "./button";
 import { Input } from "./input";
 import { Separator } from "./Separator";
-import { Sheet, SheetContent } from "./sheet";
+import { Sheet, SheetContent } from "./Sheet";
 import { Skeleton } from "./skeleton";
 import {
   Tooltip,
