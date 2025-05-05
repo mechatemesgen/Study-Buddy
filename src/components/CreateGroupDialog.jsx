@@ -7,11 +7,11 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
+} from "@/components/ui/Dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import { Textarea } from "@/components/ui/Textarea";
 import { useToast } from "@/components/ui/toast";
 import { createGroup, fetchSubjects } from "@/api/groups";
 import {
@@ -20,7 +20,7 @@ import {
   SelectContent,
   SelectItem,
   SelectValue,
-} from "@/components/ui/select";
+} from "@/components/ui/Select";
 
 export function CreateGroupDialog({ open, onOpenChange }) {
   const navigate = useNavigate(); // useNavigate for routing in Vite
