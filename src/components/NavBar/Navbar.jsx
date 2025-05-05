@@ -1,7 +1,7 @@
 import { HashLink } from 'react-router-hash-link'; // Import HashLink
 import { BookOpen, Moon, Sun, Menu, X } from "lucide-react";
 import { useAuth } from "../../hooks/use-auth";
-import { useTheme } from "next-themes";
+import { useTheme } from "@/hooks/use-theme";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
