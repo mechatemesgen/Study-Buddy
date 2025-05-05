@@ -13,7 +13,7 @@ import {
   CardTitle,
 } from "../components/ui/card";
 import { Alert, AlertDescription } from "../components/ui/alert";
-import {Navbar} from "../components/Navbar/Navbar"; 
+import {Navbar} from "../components/NavBar/Navbar"; 
 
 export default function LoginPage() {
   const navigate = useNavigate();
