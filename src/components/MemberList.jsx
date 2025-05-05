@@ -3,7 +3,7 @@ import { CardContent } from "../components/ui/card"
 import { Avatar } from "../components/ui/avatar"
 import { AvatarFallback } from "../components/ui/avatar"
 import { AvatarImage } from "../components/ui/avatar"
-import { Badge } from "../components/ui/badge"
+import { Badge } from "../components/ui/Badge"
 import { Users } from "lucide-react"
 
 export function MemberList({ members = [] }) {
