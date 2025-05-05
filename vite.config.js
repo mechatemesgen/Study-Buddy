@@ -3,10 +3,9 @@ import react from '@vitejs/plugin-react';
 import path from 'path';
 
 export default defineConfig({
-  base: '/',
   plugins: [react()],
   define: {
-    'process.env': {}
+    'process.env': {} 
   },
   resolve: {
     alias: {
@@ -18,4 +17,3 @@ export default defineConfig({
     },
   },
 });
-
