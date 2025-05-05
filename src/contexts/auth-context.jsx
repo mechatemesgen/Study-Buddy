@@ -21,10 +21,16 @@ export function AuthProvider({ children }) {
         if (stored) {
           setUser(JSON.parse(stored))
         } else {
-          const data = await refreshToken()
-          if (data.user) {
-            setUser(data.user)
-            localStorage.setItem('user', JSON.stringify(data.user))
+          try {
+            const accessToken = await refreshToken()
+            if (accessToken) {
+              const storedUser = localStorage.getItem('user')
+              if (storedUser) {
+                setUser(JSON.parse(storedUser))
+              }
+            }
+          } catch {
+            localStorage.removeItem('user')
           }
         }
       } catch {
@@ -51,8 +57,10 @@ export function AuthProvider({ children }) {
   const signup = async (details) => {
     setIsLoading(true)
     try {
-      await apiSignup(details)
-      // Do NOT setUser or save user to localStorage here
+      const data = await apiSignup(details)
+      setUser(data.user)
+      localStorage.setItem('user', JSON.stringify(data.user))
+      navigate('/dashboard', { replace: true })
     } finally {
       setIsLoading(false)
     }
