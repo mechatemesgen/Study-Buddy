@@ -28,20 +28,30 @@ const mockUsers = [
 export async function login(credentials) {
   try {
     // Use the correct login endpoint
-    const response = await axiosInstance.post(AUTH_ENDPOINTS.LOGIN, {
+    const response = await axiosInstance.post("https://gdg-backend-4.onrender.com/api/auth/login/", {
       email: credentials.email,
       password: credentials.password,
+    }, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Referrer-Policy': 'strict-origin-when-cross-origin',
+      },
     });
+
     // Backend returns: { access, refresh, user }
     let { access, refresh, user } = response.data;
+
     // Map full_name to name for frontend compatibility
     if (user.full_name) {
       user.name = user.full_name;
       delete user.full_name;
     }
+
     localStorage.setItem("accessToken", access);
     localStorage.setItem("refreshToken", refresh);
     localStorage.setItem("user", JSON.stringify(user));
+
     return { user, token: access };
   } catch (error) {
     console.error("Login failed:", error);
@@ -120,16 +130,14 @@ export async function refreshToken() {
   try {
     const refreshToken = localStorage.getItem("refreshToken");
     if (!refreshToken) {
+      console.warn("No refresh token available"); // Log missing token
       throw new Error("No refresh token available");
     }
-    
     const response = await axiosInstance.post(AUTH_ENDPOINTS.REFRESH_TOKEN, {
       refresh: refreshToken,
     });
-    
     const { access } = response.data;
     localStorage.setItem("accessToken", access);
-    
     return access;
   } catch (error) {
     console.error("Token refresh failed:", error);

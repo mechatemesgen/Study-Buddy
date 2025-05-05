@@ -67,7 +67,16 @@ axiosInstance.interceptors.response.use(
       try {
         const refreshToken = localStorage.getItem('refreshToken');
         if (!refreshToken) {
-          throw new Error('No refresh token available');
+          console.warn('No refresh token available'); // Log missing token
+          localStorage.removeItem('accessToken');
+          localStorage.removeItem('refreshToken');
+          localStorage.removeItem('user');
+          
+          // If we're not already on the login page, redirect to it
+          if (window.location.pathname !== '/login') {
+            window.location.href = '/login';
+          }
+          return Promise.reject(error);
         }
         
         // Request new access token using refresh token
@@ -83,6 +92,8 @@ axiosInstance.interceptors.response.use(
         originalRequest.headers.Authorization = `Bearer ${access}`;
         return axios(originalRequest);
       } catch (refreshError) {
+        console.error('Token refresh failed:', refreshError);
+        
         // If refresh token is invalid, clear auth data and redirect to login
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
